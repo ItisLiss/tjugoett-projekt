@@ -1,0 +1,5 @@
+
+puplic interface IPlayerStrategy
+{
+    
+}
