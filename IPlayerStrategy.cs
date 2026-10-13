@@ -1,5 +1,5 @@
 
-puplic interface IPlayerStrategy
+public interface IPlayerStrategy
 {
     
 }
