@@ -3,6 +3,13 @@ public class Card
     public Suit Suit { get; set; }
     public Rank Rank { get; set; }
 
+    public int Value => Rank switch
+    {
+        Rank.Jack or Rank.Queen or Rank.King => 10,
+        Rank.Ace => 11,
+        _ => (int)Rank
+    };
+
     public Card(Suit suit, Rank rank)
     {
         Suit = suit;
