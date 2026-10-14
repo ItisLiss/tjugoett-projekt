@@ -1,10 +1,13 @@
-using System;
+﻿using System;
 
-class Program
+namespace Kunskapskontroll3
 {
-    static void Main(string[] args)
+    class Program
     {
-        ConsoleUi ui = new();
-        ui.RunGameLoop();
+        static void Main(string[] args)
+        {
+            ConsoleUi ui = new();
+            ui.RunGameLoop();
+        }
     }
 }
