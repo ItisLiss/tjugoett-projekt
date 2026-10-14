@@ -48,9 +48,42 @@ namespace Kunskapskontroll3
         public void StartNewGame()
         {
             Console.Clear();
-            Console.WriteLine("--- NYTT SPEL ---");
-            Console.WriteLine("Spelet håller på att startas... (Här kopplas Round-klassen in sen!)");
-            Console.WriteLine("\nTryck på valfri knapp för att gå tillbaka till menyn.");
+            Console.WriteLine("==============================");
+            Console.WriteLine("          SPELSTART           ");
+            Console.WriteLine("==============================\n");
+
+            // 1. Skapa och blanda kortleken
+            Deck deck = new Deck();
+            deck.Shuffle(); // (Om din Deck-klass har en Shuffle-metod)
+
+            // 2. Skapa listor för spelarens och dealerns kort
+            List<Card> playerCards = new List<Card>();
+            List<Card> dealerCards = new List<Card>();
+
+            // 3. Dela ut 2 kort till spelaren
+            playerCards.Add(deck.DealCard());
+            playerCards.Add(deck.DealCard());
+
+            // 4. Dela ut 2 kort till dealern
+            dealerCards.Add(deck.DealCard()); // Det första kortet (visas)
+            dealerCards.Add(deck.DealCard()); // Det andra kortet (dolt hålkort)
+
+            // 5. Skriva ut bordet enligt User Story 3
+            Console.WriteLine("DEALERNS HAND:");
+            Console.WriteLine($"  [ {dealerCards[0]} ]  [ 🂠 DOLDT KORT ]\n");
+
+            Console.WriteLine("DINA KORT:");
+            foreach (var card in playerCards)
+            {
+                Console.WriteLine($"  [ {card} ]");
+            }
+
+            // Räkna ut spelarens poäng med hjälp av Card-klassens .Value
+            int playerTotal = playerCards[0].Value + playerCards[1].Value;
+            Console.WriteLine($"\nTotalt värde på dina kort: {playerTotal}");
+
+            Console.WriteLine("\n------------------------------");
+            Console.WriteLine("Tryck på valfri knapp för att gå tillbaka till menyn...");
             Console.ReadKey();
         }
 
