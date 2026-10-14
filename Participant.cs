@@ -1,12 +1,16 @@
-class Participant()
+public class Participant
 {
-    Hand hand = new Hand();
-    Move move {get; set;}
+    public string Name { get; }
+    public Hand Hand { get; }
 
-
-
-    public void RecieveCard()
+    protected Participant(string name)
     {
-        
+        Name = name;
+        Hand = new Hand();
+    }
+
+    public void ReceiveCard(Card card)
+    {
+        Hand.AddCard(card);
     }
 }
