@@ -54,8 +54,46 @@ public class ConsoleUi
         {
             Console.WriteLine(player.Name);
         }
+        Deck deck = new Deck();
+        deck.Shuffle();
+        Round round = new Round();
+        foreach (Player player in players)
+        {
+            Card card = deck.DrawCard();
+            bool busted = round.Turn(player, card);
 
-        Console.WriteLine("\nSpelrundan är inte inkopplad ännu.");
+            Card secondCard = deck.DrawCard();
+            busted = round.Turn(player, secondCard);
+            if (busted)
+            {
+                DisplayMessage("Du har spruckit!");
+            }
+            while (!busted)
+            {
+                Console.Write("Köp kort (K) eller stanna (S)? ");
+                string? choice = Console.ReadLine();
+                if (choice?.Trim().ToUpper() == "K")
+                {
+                    Card newCard = deck.DrawCard();
+                    busted = round.Turn(player, newCard);
+                    Console.WriteLine($"Dina poäng: {player.Hand.Value}");
+                    if (busted)
+                    {
+                        DisplayMessage("Du har spruckit!");
+                    }
+                }
+                else if (choice?.Trim().ToUpper() == "S")
+                {
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Ogiltigt val. Välj K eller S.");
+                }
+
+            }
+        }
+
         Console.WriteLine("Tryck på valfri tangent för att gå tillbaka till menyn.");
         Console.ReadKey();
     }
