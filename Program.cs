@@ -1,11 +1,10 @@
-﻿namespace Kunskapskontroll3
+using System;
+
+class Program
 {
-    class Program
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
-        {
-            ConsoleUi ui = new ConsoleUi();
-            ui.RunGameLoop(); // Startar spelet via UI-klassen
-        }
+        ConsoleUi ui = new();
+        ui.RunGameLoop();
     }
 }
