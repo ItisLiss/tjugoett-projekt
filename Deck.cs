@@ -32,7 +32,7 @@ class Deck
         return cards.Count;
     }
 
-    public Card DrawCard()
+    public Card Deal()
     {
         if (cards.Count == 0)
         {
