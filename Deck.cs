@@ -12,4 +12,18 @@ class Deck
             }
         }
     }
+
+    public void Shuffle()
+    {
+        Random rand = new Random();
+
+        for( int i = cards.Count -1; i > 0 ; i--)
+        {
+            int r = rand.Next(i + 1);
+            
+            //uses a tuple to swap the places of two values without the need of a temp variable.
+            (cards[i], cards[r]) = (cards[r],cards[i]);
+            
+        }
+    }
 }
