@@ -1,44 +1,50 @@
-class Deck
-{
-    List<Card> cards = new List<Card>();
+using System;
+using System.Collections.Generic;
 
-    public Deck()
+namespace Kunskapskontroll3
+{
+    public class Deck
     {
-        foreach(Suit suit in Enum.GetValues<Suit>())
+        private List<Card> cards = new List<Card>();
+
+        public Deck()
         {
-            foreach(Rank rank in Enum.GetValues<Rank>())
+            foreach (Suit suit in Enum.GetValues<Suit>())
             {
-                cards.Add(new Card(suit,rank));
+                foreach (Rank rank in Enum.GetValues<Rank>())
+                {
+                    cards.Add(new Card(suit, rank));
+                }
+            }
+            Shuffle();
+        }
+
+        public void Shuffle()
+        {
+            Random rand = new Random();
+
+            for (int i = cards.Count - 1; i > 0; i--)
+            {
+                int r = rand.Next(i + 1);
+                (cards[i], cards[r]) = (cards[r], cards[i]);
             }
         }
-    }
 
-    public void Shuffle()
-    {
-        Random rand = new Random();
-
-        for( int i = cards.Count -1; i > 0 ; i--)
+        public Card DealCard()
         {
-            int r = rand.Next(i + 1);
-            
-            //uses a tuple to swap the places of two values without the need of a temp variable.
-            (cards[i], cards[r]) = (cards[r],cards[i]);
-            
-        }
-    }
+            if (cards.Count == 0)
+            {
+                throw new InvalidOperationException("Kortleken är slut!");
+            }
 
-    public int Total()
-    {
-        return cards.Count;
-    }
-    public Card DrawCard()
-    {
-        if (cards.Count == 0)
-        {
-            throw new InvalidOperationException("Kortleken är tom.");
+            Card cardToDeal = cards[0];
+            cards.RemoveAt(0);
+            return cardToDeal;
         }
-        Card card = cards[0];
-        cards.RemoveAt(0);
-        return card;
+
+        public int Total()
+        {
+            return cards.Count;
+        }
     }
 }
