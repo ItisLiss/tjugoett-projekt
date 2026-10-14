@@ -1,11 +1,11 @@
 ﻿namespace Kunskapskontroll3
 {
-    internal class Program
+    class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Välkommen till Tjugoett!");
-            // Här startas spelet sedan!
+            ConsoleUi ui = new ConsoleUi();
+            ui.RunGameLoop(); // Startar spelet via UI-klassen
         }
     }
 }
