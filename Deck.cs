@@ -32,6 +32,24 @@ class Deck
         return cards.Count;
     }
 
+    public void PrepareForNextRound()
+    {
+        if (cards.Count < 15)
+        {
+            cards.Clear();
+
+            foreach (Suit suit in Enum.GetValues<Suit>())
+            {
+                foreach (Rank rank in Enum.GetValues<Rank>())
+                {
+                    cards.Add(new Card(suit, rank));
+                }
+            }
+
+            Shuffle();
+        }
+    }
+
     public Card Deal()
     {
         if (cards.Count == 0)
