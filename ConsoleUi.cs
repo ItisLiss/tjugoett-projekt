@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Kunskapskontroll3
 {
@@ -36,7 +37,7 @@ namespace Kunskapskontroll3
         {
             Console.Clear();
             Console.WriteLine("==============================");
-            Console.WriteLine("   VÄLKOMMEN TILL TJUGOETT!   ");
+            Console.WriteLine("    VÄLKOMMEN TILL TJUGOETT!   ");
             Console.WriteLine("==============================");
             Console.WriteLine("1. Starta nytt spel");
             Console.WriteLine("2. Visa regler");
@@ -44,13 +45,40 @@ namespace Kunskapskontroll3
             Console.Write("\nVälj ett alternativ (1-3): ");
         }
 
-        // Tillagd metod så att kompileringsfelet försvinner!
         public void StartNewGame()
         {
             Console.Clear();
-            Console.WriteLine("--- NYTT SPEL ---");
-            Console.WriteLine("Spelet håller på att startas... (Här kopplas Round-klassen in sen!)");
-            Console.WriteLine("\nTryck på valfri knapp för att gå tillbaka till menyn.");
+            Console.WriteLine("==============================");
+            Console.WriteLine("          SPELSTART           ");
+            Console.WriteLine("==============================\n");
+
+            // Skapa och blanda en ny kortlek
+            Deck deck = new Deck();
+
+            List<Card> playerCards = new List<Card>();
+            List<Card> dealerCards = new List<Card>();
+
+            // Dela ut 2 kort till spelaren
+            playerCards.Add(deck.DealCard());
+            playerCards.Add(deck.DealCard());
+
+            // Dela ut 2 kort till dealern (ett synligt, ett dolt)
+            dealerCards.Add(deck.DealCard()); 
+            dealerCards.Add(deck.DealCard()); 
+
+            // Skriv ut dealerns hand (första synlig, andra dold)
+            Console.WriteLine("DEALERNS HAND:");
+            Console.WriteLine($"  [ {dealerCards[0]} ]  [ 🂠 DOLDT KORT ]\n");
+
+            // Skriv ut spelarens hand
+            Console.WriteLine("DINA KORT:");
+            foreach (var card in playerCards)
+            {
+                Console.WriteLine($"  [ {card} ]");
+            }
+
+            Console.WriteLine("\n------------------------------");
+            Console.WriteLine("Tryck på valfri knapp för att gå tillbaka till menyn...");
             Console.ReadKey();
         }
 
