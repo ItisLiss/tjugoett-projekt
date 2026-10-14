@@ -26,4 +26,9 @@ class Deck
             
         }
     }
+
+    public int Total()
+    {
+        return cards.Count;
+    }
 }
