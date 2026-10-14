@@ -31,4 +31,14 @@ class Deck
     {
         return cards.Count;
     }
+    public Card DrawCard()
+    {
+        if (cards.Count == 0)
+        {
+            throw new InvalidOperationException("Kortleken är tom.");
+        }
+        Card card = cards[0];
+        cards.RemoveAt(0);
+        return card;
+    }
 }
