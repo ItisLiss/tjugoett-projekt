@@ -8,4 +8,9 @@ public class Participant
         Name = name;
         Hand = new Hand();
     }
+
+    public void ReceiveCard(Card card)
+    {
+        Hand.AddCard(card);
+    }
 }

@@ -1,6 +1,7 @@
 public class Hand
 {
     private readonly List<Card> _cards = new();
+
     public IReadOnlyList<Card> Cards => _cards;
 
     public int Value
@@ -34,5 +35,4 @@ public class Hand
     {
         _cards.Add(card);
     }
-    
 }

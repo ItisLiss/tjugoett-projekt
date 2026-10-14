@@ -1,17 +1,20 @@
-﻿# Tjugoett
+# Tjugoett
 
-## Pågående arbete: lägga till spelare
+Ett konsolbaserat kortspel i C# där en till fem spelare ska spela tjugoett mot en givare. Programmet utvecklas gemensamt som en del av en kurs i programmering och objektorienterad utveckling.
 
-Vi arbetar med user storyn: **Som spelare vill jag kunna lägga till 1–5 spelare med namn, så att vi kan spela flera tillsammans.**
+## Struktur
 
-### Hittills
-- `Player` har en konstruktor som tar emot spelarens namn och skickar det vidare till basklassen `Participant`.
-- `Participant` lagrar deltagarens namn och skapar en tom `Hand` för deltagaren.
-- `ConsoleUi` frågar efter 1–5 spelare och deras namn, och `Program` anropar metoden för att samla in spelarna.
-- `Hand` lagrar kort i en intern lista, gör korten tillgängliga för läsning via `Cards` och har metoden `AddCard` för att lägga till kort.
+- `Card`, `Suit` och `Rank` beskriver korten.
+- `Deck` bygger och blandar kortleken.
+- `Hand` håller en deltagares kort och räknar handens värde.
+- `Participant` innehåller gemensamma egenskaper för `Player` och `Dealer`.
+- `Round` och `Game` är avsedda att hantera spelrundan respektive spelets flöde.
+- `ConsoleUi` hanterar konsolmeny och användarinmatning.
 
-### Kvar att göra
-- Använda spelarlistan i resten av spelet när spelrundan kopplas in.
-- Lägga till handens poängräkning och kontroller för mjuk hand, tjugoett och sprucken hand.
+## Pågående arbete
 
-Vi uppdaterar den här README:n efterhand som arbetet går framåt.
+En pågående user story är: **Som spelare vill jag kunna lägga till 1–5 spelare med namn, så att vi kan spela flera tillsammans.**
+
+Spelarregistreringen frågar efter antal och namn, validerar att antalet är mellan 1 och 5 och att namnen inte är tomma. Spelarlistan visas när ett nytt spel startas. Själva spelrundan är ännu inte inkopplad.
+
+Arbetet sker på feature-brancher och integreras till `dev` via pull requests och kodgranskning.

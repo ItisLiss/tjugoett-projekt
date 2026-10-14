@@ -1,2 +1,10 @@
-﻿ConsoleUi consoleUi = new();
-List<Player> players = consoleUi.AddPlayers();
+using System;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        ConsoleUi ui = new();
+        ui.RunGameLoop();
+    }
+}
