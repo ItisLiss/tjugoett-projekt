@@ -164,5 +164,14 @@ namespace Kunskapskontroll3
                 Console.WriteLine("Namnet får inte vara tomt.");
             }
         }
+
+        private static string OutComeText(Outcome outcome) => outcome switch
+        {
+            Outcome.Win => "Vinst",
+            Outcome.Lose => "Förlust",
+            Outcome.Push => "Lika",
+            Outcome.Blackjack => "Blackjack",
+            _ => ""  
+        };
     }
 }
