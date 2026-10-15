@@ -45,42 +45,60 @@ namespace Kunskapskontroll3
             Console.Write("\nVälj ett alternativ (1-3): ");
         }
 
-        public void StartNewGame()
+    public void StartNewGame()
+    {
+        Console.Clear();
+        Console.WriteLine("--- NYTT SPEL ---");
+        List<Player> players = AddPlayers();
+
+        Console.WriteLine("\nSpelare vid bordet:");
+        foreach (Player player in players)
         {
-            Console.Clear();
-            Console.WriteLine("--- NYTT SPEL ---");
-
-            List<Player> players = AddPlayers();
-            Deck deck = new Deck();
-
-            List<Card> dealerCards = new List<Card>
-            {
-                deck.DealCard(),
-                deck.DealCard()
-            };
-
-            Console.Clear();
-            Console.WriteLine("==============================");
-            Console.WriteLine("          INITIAL GIV         ");
-            Console.WriteLine("==============================\n");
-
-            Console.WriteLine("DEALERNS HAND:");
-            Console.WriteLine($"  [ {dealerCards[0]} ]  [ 🂠 DOLDT KORT ]\n");
-
-            foreach (Player player in players)
-            {
-                Card card1 = deck.DealCard();
-                Card card2 = deck.DealCard();
-
-                Console.WriteLine($"DINA KORT ({player.Name.ToUpper()}):");
-                Console.WriteLine($"  [ {card1} ]");
-                Console.WriteLine($"  [ {card2} ]\n");
-            }
-
-            Console.WriteLine("------------------------------");
-            Console.WriteLine("Tryck på valfri tangent för att gå tillbaka till menyn.");
-            Console.ReadKey();
+            Console.WriteLine(player.Name);
         }
+        Deck deck = new Deck();
+        deck.Shuffle();
+        Round round = new Round();
+        foreach (Player player in players)
+        {
+            Card card = deck.DealCard();
+            bool busted = round.Turn(player, card);
+
+            Card secondCard = deck.DealCard();
+            busted = round.Turn(player, secondCard);
+            if (busted)
+            {
+                DisplayMessage("Du har spruckit!");
+            }
+            while (!busted)
+            {
+                Console.Write("Köp kort (K) eller stanna (S)? ");
+                string? choice = Console.ReadLine();
+                if (choice?.Trim().ToUpper() == "K")
+                {
+                    Card newCard = deck.DealCard();
+                    busted = round.Turn(player, newCard);
+                    Console.WriteLine($"Dina poäng: {player.Hand.Value}");
+                    if (busted)
+                    {
+                        DisplayMessage("Du har spruckit!");
+                    }
+                }
+                else if (choice?.Trim().ToUpper() == "S")
+                {
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Ogiltigt val. Välj K eller S.");
+                }
+
+            }
+        }
+
+        Console.WriteLine("Tryck på valfri tangent för att gå tillbaka till menyn.");
+        Console.ReadKey();
+    }
 
         public List<Player> AddPlayers()
         {
