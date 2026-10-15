@@ -62,10 +62,10 @@ namespace Kunskapskontroll3
         foreach (Player player in players)
         {
             Card card = deck.DealCard();
-            bool busted = round.Turn(player, card);
+            bool busted = round.GiveCardAndCheckBust(player, card);
 
             Card secondCard = deck.DealCard();
-            busted = round.Turn(player, secondCard);
+            busted = round.GiveCardAndCheckBust(player, secondCard);
             if (busted)
             {
                 DisplayMessage("Du har spruckit!");
@@ -77,7 +77,7 @@ namespace Kunskapskontroll3
                 if (choice?.Trim().ToUpper() == "K")
                 {
                     Card newCard = deck.DealCard();
-                    busted = round.Turn(player, newCard);
+                    busted = round.GiveCardAndCheckBust(player, newCard);
                     Console.WriteLine($"Dina poäng: {player.Hand.Value}");
                     if (busted)
                     {
