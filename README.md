@@ -20,8 +20,16 @@ Spelarna kan registreras med namn; antalet begränsas till 1–5. `Player` ärve
 
 `Round` har grundläggande stöd för att ge en deltagare kort och kontrollera om handen gått över 21. Spelets fullständiga rundflöde är ännu inte färdigkopplat till `ConsoleUi`.
 
+`GameStorage` kan spara spelarprofiler i `players.txt`, en spelare per rad med fälten namn, vinster, förluster och blackjacks separerade med semikolon. `LoadPlayers` läser raderna, delar upp fälten och skapar spelare med deras sparade statistik. Rader med fel antal fält, tomt namn eller ogiltig/negativ statistik avvisas med `InvalidDataException`.
+
+`ConsoleUi` läser nu in sparade profiler när menyloopen startar. Val av sparad spelare och sparning när spelet avslutas är ännu inte inkopplade.
+
 ## Nästa steg
 
+- Erbjud val mellan sparad och ny spelare i `AddPlayers`.
+- Spara spelarlistan när nya profiler lagts till och när statistik uppdaterats.
+- Bestäm hur semikolon i spelarnamn ska hanteras, eftersom semikolon används som fältavgränsare.
+- Bygg och prova sparning och inläsning med både giltiga och felaktiga data.
 - Färdigställa `Round` med utdelning, spelarturer, givartur och utfallsberäkning.
 - Koppla rundflödet till `Game` och `ConsoleUi`, inklusive visning av handvärden.
 - Anropa `Deck.PrepareForNextRound()` mellan rundor.

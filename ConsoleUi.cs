@@ -5,8 +5,11 @@ namespace Kunskapskontroll3
 {
     public class ConsoleUi
     {
+        private readonly GameStorage _gameStorage = new();
+        private List<Player> _savedPlayers = new();
         public void RunGameLoop()
         {
+            _savedPlayers = _gameStorage.LoadPlayers();
             bool running = true;
 
             while (running)

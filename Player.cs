@@ -8,6 +8,13 @@ public class Player : Participant
     {
     }
 
+    public Player(string name, int wins, int losses, int blackjacks) : base(name)
+    {
+        Wins = wins;
+        Losses = losses;
+        Blackjacks = blackjacks;
+    }
+
     public void RecordOutcome(Outcome outcome)
     {
         switch (outcome)
