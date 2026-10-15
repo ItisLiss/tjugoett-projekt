@@ -5,11 +5,12 @@ Ett konsolbaserat kortspel i C# där en till fem spelare ska spela tjugoett mot 
 ## Struktur
 
 - `Card`, `Suit` och `Rank` beskriver korten.
-- `Deck` bygger kortleken, blandar den med Fisher–Yates, delar ut kort med `Deal()` och har `PrepareForNextRound()` för att skapa och blanda en ny lek när färre än 15 kort återstår.
+- `Deck` bygger kortleken, blandar den med Fisher–Yates, delar ut kort med `DealCard()` och har `PrepareForNextRound()` för att skapa och blanda en ny lek när färre än 15 kort återstår.
 - `Hand` håller en deltagares kort och räknar handens värde.
 - `Participant` innehåller gemensamma egenskaper för `Player` och `Dealer`.
 - `Round` och `Game` är avsedda att hantera spelrundan respektive spelets flöde.
 - `ConsoleUi` hanterar konsolmeny och användarinmatning.
+- `CardRenderer` bygger en spelkortsmall som rader av text för konsolen.
 
 ## Pågående arbete
 
@@ -22,5 +23,7 @@ Vi arbetar också med user storyn: **Som spelare vill jag se min hands värde, �
 Nästa steg är att bygga vidare på `Round` och koppla ihop kortutdelning, spelarens val och visning av handens värde via `ConsoleUi`.
 
 `Deck.PrepareForNextRound()` finns nu, men behöver anropas mellan rundorna för att kontrollen av återstående kort ska användas i spelet.
+
+Kortgrafikens `CardRenderer.Render(Card)` returnerar kortet som rader med dynamisk valör och färgsymbol. Renderaren behöver fortfarande kopplas till `ConsoleUi` och testas visuellt i konsolen.
 
 Arbetet sker på feature-brancher och integreras till `dev` via pull requests och kodgranskning.
