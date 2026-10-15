@@ -5,8 +5,10 @@ namespace Kunskapskontroll3
 
 class Round
 {
+
     
-    public bool Turn(Participant participant, Card card)
+    public bool GiveCardAndCheckBust(Participant participant, Card card)
+    // Ge ett kort och kontrollera om spelaren har spruckit.
     {
         participant.ReceiveCard(card);
         int total = participant.Hand.Value;
