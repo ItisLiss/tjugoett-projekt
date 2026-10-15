@@ -1,47 +1,49 @@
 using System;
 using System.Collections.Generic;
 
-public class ConsoleUi
+namespace Kunskapskontroll3
 {
-    public void RunGameLoop()
+    public class ConsoleUi
     {
-        bool running = true;
-
-        while (running)
+        public void RunGameLoop()
         {
-            DisplayMenu();
-            string? choice = Console.ReadLine();
+            bool running = true;
 
-            switch (choice)
+            while (running)
             {
-                case "1":
-                    StartNewGame();
-                    break;
-                case "2":
-                    DisplayRules();
-                    break;
-                case "3":
-                    running = false;
-                    DisplayMessage("Tack för att du spelade!");
-                    break;
-                default:
-                    DisplayMessage("Ogiltigt val, försök igen.");
-                    break;
+                DisplayMenu();
+                string? choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        StartNewGame();
+                        break;
+                    case "2":
+                        DisplayRules();
+                        break;
+                    case "3":
+                        running = false;
+                        DisplayMessage("Tack för att du spelade!");
+                        break;
+                    default:
+                        DisplayMessage("Ogiltigt val, försök igen.");
+                        break;
+                }
             }
         }
-    }
 
-    public void DisplayMenu()
-    {
-        Console.Clear();
-        Console.WriteLine("==============================");
-        Console.WriteLine("   VÄLKOMMEN TILL TJUGOETT!   ");
-        Console.WriteLine("==============================");
-        Console.WriteLine("1. Starta nytt spel");
-        Console.WriteLine("2. Visa regler");
-        Console.WriteLine("3. Avsluta");
-        Console.Write("\nVälj ett alternativ (1-3): ");
-    }
+        public void DisplayMenu()
+        {
+            Console.Clear();
+            Console.WriteLine("==============================");
+            Console.WriteLine("    VÄLKOMMEN TILL TJUGOETT!   ");
+            Console.WriteLine("==============================");
+            Console.WriteLine("1. Starta nytt spel");
+            Console.WriteLine("2. Visa regler");
+            Console.WriteLine("3. Avsluta");
+            Console.Write("\nVälj ett alternativ (1-3): ");
+        }
 
     public void StartNewGame()
     {
@@ -59,10 +61,10 @@ public class ConsoleUi
         Round round = new Round();
         foreach (Player player in players)
         {
-            Card card = deck.DrawCard();
+            Card card = deck.DealCard();
             bool busted = round.Turn(player, card);
 
-            Card secondCard = deck.DrawCard();
+            Card secondCard = deck.DealCard();
             busted = round.Turn(player, secondCard);
             if (busted)
             {
@@ -74,7 +76,7 @@ public class ConsoleUi
                 string? choice = Console.ReadLine();
                 if (choice?.Trim().ToUpper() == "K")
                 {
-                    Card newCard = deck.DrawCard();
+                    Card newCard = deck.DealCard();
                     busted = round.Turn(player, newCard);
                     Console.WriteLine($"Dina poäng: {player.Hand.Value}");
                     if (busted)
@@ -98,65 +100,66 @@ public class ConsoleUi
         Console.ReadKey();
     }
 
-    public List<Player> AddPlayers()
-    {
-        int playerCount = ReadPlayerCount();
-        List<Player> players = new();
-
-        for (int i = 0; i < playerCount; i++)
+        public List<Player> AddPlayers()
         {
-            string name = ReadPlayerName(i + 1);
-            players.Add(new Player(name));
-        }
+            int playerCount = ReadPlayerCount();
+            List<Player> players = new();
 
-        return players;
-    }
-
-    public void DisplayRules()
-    {
-        Console.Clear();
-        Console.WriteLine("--- REGLER ---");
-        Console.WriteLine("Kom så nära 21 som möjligt utan att överstiga 21.");
-        Console.WriteLine("\nTryck på valfri tangent för att gå tillbaka.");
-        Console.ReadKey();
-    }
-
-    public void DisplayMessage(string message)
-    {
-        Console.WriteLine($"\n{message}");
-        Console.WriteLine("Tryck på valfri tangent för att fortsätta...");
-        Console.ReadKey();
-    }
-
-    private static int ReadPlayerCount()
-    {
-        while (true)
-        {
-            Console.Write("Hur många ska spela? Ange 1-5: ");
-            string? input = Console.ReadLine();
-
-            if (int.TryParse(input, out int count) && count is >= 1 and <= 5)
+            for (int i = 0; i < playerCount; i++)
             {
-                return count;
+                string name = ReadPlayerName(i + 1);
+                players.Add(new Player(name));
             }
 
-            Console.WriteLine("Ange ett heltal mellan 1 och 5.");
+            return players;
         }
-    }
 
-    private static string ReadPlayerName(int playerNumber)
-    {
-        while (true)
+        public void DisplayRules()
         {
-            Console.Write($"Ange namn för spelare {playerNumber}: ");
-            string? name = Console.ReadLine();
+            Console.Clear();
+            Console.WriteLine("--- REGLER ---");
+            Console.WriteLine("Kom så nära 21 som möjligt utan att överstiga 21.");
+            Console.WriteLine("\nTryck på valfri tangent för att gå tillbaka.");
+            Console.ReadKey();
+        }
 
-            if (!string.IsNullOrWhiteSpace(name))
+        public void DisplayMessage(string message)
+        {
+            Console.WriteLine($"\n{message}");
+            Console.WriteLine("Tryck på valfri tangent för att fortsätta...");
+            Console.ReadKey();
+        }
+
+        private static int ReadPlayerCount()
+        {
+            while (true)
             {
-                return name.Trim();
-            }
+                Console.Write("Hur många ska spela? Ange 1-5: ");
+                string? input = Console.ReadLine();
 
-            Console.WriteLine("Namnet får inte vara tomt.");
+                if (int.TryParse(input, out int count) && count is >= 1 and <= 5)
+                {
+                    return count;
+                }
+
+                Console.WriteLine("Ange ett heltal mellan 1 och 5.");
+            }
+        }
+
+        private static string ReadPlayerName(int playerNumber)
+        {
+            while (true)
+            {
+                Console.Write($"Ange namn för spelare {playerNumber}: ");
+                string? name = Console.ReadLine();
+
+                if (!string.IsNullOrWhiteSpace(name))
+                {
+                    return name.Trim();
+                }
+
+                Console.WriteLine("Namnet får inte vara tomt.");
+            }
         }
     }
 }
