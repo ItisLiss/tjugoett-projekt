@@ -1,7 +1,11 @@
+using System.Collections.Generic;
+
+namespace Kunskapskontroll3
+{
 public class Participant
 {
     public string Name { get; }
-    public Hand Hand { get; }
+    public Hand Hand { get; private set;}
 
     protected Participant(string name)
     {
@@ -13,4 +17,10 @@ public class Participant
     {
         Hand.AddCard(card);
     }
+
+    public virtual void NewHand()
+    {
+        Hand = new Hand();
+    }
+}
 }

@@ -38,3 +38,34 @@ Spelarna kan registreras med namn; antalet begränsas till 1–5. `Player` ärve
 Projektet byggdes efter ändringen av spelarstatistiken med 0 fel. Bygget rapporterade en varning om att `Dealer.HoleCardRevealed` inte används.
 
 Arbetet sker på feature-brancher och integreras till `dev` via pull requests och kodgranskning.
+
+## 🏗️ Arkitektur & Designmönster
+
+Projektet är uppdelat för att uppnå **separation of concerns** (separerat ansvar), vilket gör koden lättare att testa, underhålla och bygga ut:
+
+*   **`Program.cs` (Entry Point):** En ren startpunkt som enbart ansvarar för att starta spelet och fånga upp eventuella oväntade krascher (global felhantering).
+*   **`ConsoleUi.cs` (View / UI):** Hanterar all interaktion med användaren i konsolen (menyer, inmatning av spelarnamn, utskrift av kort och poäng). Känner inte till spelets interna regler i detalj.
+*   **`Game.cs` (Spelmotor / Business Logic):** Håller i själva spelloopen, hanterar kortleken, delar ut kort och styr spelets regler (t.ex. räkna poäng och avgöra vinnare).
+*   **Modeller (`Participant`, `Player`, `Dealer`, `Deck`, `Card`, `Hand`):** Domänmodeller som kapslar in datan och grundläggande beteenden för spelets entiteter.
+
+---
+
+## 📂 Projektstruktur & Ansvarsområden
+
+| Fil / Klass | Ansvar |
+| :--- | :--- |
+| `Program.cs` | Startpunkt och felhantering (`try-catch`). |
+| `ConsoleUi.cs` | Konsol-IO, menyer, spelarinput och utskrifter. |
+| `Game.cs` | Spelmotor, rundhantering och flöde. |
+| `Deck.cs` | Skapa, blanda och dela ut kort från kortleken. |
+| `Card.cs` | Representerar enskilda kort (valör och färg). |
+| `Participant.cs` | Basklass för spelare och dealer (håller reda på hand och kortmottagning). |
+| `Player.cs` | Specifik logik för spelare. |
+| `Dealer.cs` | Specifik logik för dealern. |
+
+## 🎮 Funktioner (Implementerade User Stories)
+* [x] **Huvudmeny:** Starta spelet eller avsluta.
+* [x] **Spelare:** Stöd för att lägga till 1–5 spelare med egna namn.
+* [x] **Kortlek & Utskrift:** Generera en fullständig kortlek med 52 kort, blanda slumpmässigt och dela ut starthand.
+* [x] **Spelardrag:** Spelaren kan välja att dra kort ("Hit") eller stanna ("Stand").
+* [x] **Felhantering:** Programmet kraschar inte vid felaktig inmatning (`try-catch` och validering).

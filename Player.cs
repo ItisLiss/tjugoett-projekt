@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+
+namespace Kunskapskontroll3
+{
 public class Player : Participant
 {
     public int Wins { get; private set; }
@@ -36,4 +40,5 @@ public class Player : Participant
                 break;
         }
     }
+}
 }
