@@ -1,5 +1,8 @@
 
-public interface IPlayerStrategy
+namespace Kunskapskontroll3
 {
-    Move ChooseMove(Hand hand, Card dealerUpcard);
+    public interface IPlayerStrategy
+    {
+        Move ChooseMove(Hand hand, Card dealerUpcard);
+    }
 }
