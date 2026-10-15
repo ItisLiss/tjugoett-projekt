@@ -46,17 +46,23 @@ namespace Kunskapskontroll3
         {
             return cards.Count;
         }
-    
-    public Card DrawCard()
+    public void PrepareForNextRound()
     {
-        if (cards.Count == 0)
+        if (cards.Count < 15)
         {
-            throw new InvalidOperationException("Kortleken är tom.");
+            cards.Clear();
+
+            foreach (Suit suit in Enum.GetValues<Suit>())
+            {
+                foreach (Rank rank in Enum.GetValues<Rank>())
+                {
+                    cards.Add(new Card(suit, rank));
+                }
+            }
+
+            Shuffle();
         }
-        Card card = cards[0];
-        cards.RemoveAt(0);
-        return card;
     }
-    
+
 }
 }
