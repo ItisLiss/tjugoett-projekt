@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+
+namespace Kunskapskontroll3
+{
 class CardRenderer
 {
     public string[] Render(Card card)
@@ -31,4 +35,5 @@ class CardRenderer
             "└───────┘"
         };
     }
+}
 }

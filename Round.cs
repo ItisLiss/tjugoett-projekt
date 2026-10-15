@@ -1,4 +1,7 @@
+using System.Collections.Generic;
 
+namespace Kunskapskontroll3
+{
 
 class Round
 {
@@ -17,4 +20,5 @@ class Round
     {
          return total > 21;
     }
+}
 }
