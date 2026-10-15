@@ -1,3 +1,5 @@
+namespace Kunskapskontroll3
+{
 public class GameStorage
 {
     public void SavePlayers(List<Player> players)
@@ -49,4 +51,5 @@ public class GameStorage
         }
         return players;
     }
+}
 }
