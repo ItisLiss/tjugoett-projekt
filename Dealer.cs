@@ -36,4 +36,10 @@ class Dealer : Participant
         else 
             return $"{Hand.Cards[0]} ??";
     }
+
+    public override void NewHand()
+    {
+        base.NewHand();
+        HoleCardRevealed = false;
+    }
 }
