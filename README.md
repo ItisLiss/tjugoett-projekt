@@ -12,18 +12,21 @@ Ett konsolbaserat kortspel i C# där en till fem spelare ska spela tjugoett mot 
 - `ConsoleUi` hanterar konsolmeny och användarinmatning.
 - `CardRenderer` bygger en spelkortsmall som rader av text för konsolen.
 
-## Pågående arbete
+## Status
 
-En pågående user story är: **Som spelare vill jag kunna lägga till 1–5 spelare med namn, så att vi kan spela flera tillsammans.**
+Spelarna kan registreras med namn; antalet begränsas till 1–5. `Player` ärver från `Participant` och håller statistik för vinster, förluster och blackjacks. `RecordOutcome(Outcome)` uppdaterar statistiken: en vanlig vinst ökar `Wins`, en förlust ökar `Losses`, en blackjack ökar både `Wins` och `Blackjacks`, och oavgjort ändrar inga av räknarna.
 
-Spelarregistreringen frågar efter antal och namn, validerar att antalet är mellan 1 och 5 och att namnen inte är tomma. Spelarlistan visas när ett nytt spel startas. Själva spelrundan är ännu inte inkopplad.
+`Hand` räknar handens värde och hanterar ess som 1 eller 11. Den innehåller även statuskontroller för mjuk hand, bust och blackjack samt `Clear()` för att tömma handen.
 
-Vi arbetar också med user storyn: **Som spelare vill jag se min hands värde, även när esset räknas som 1 eller 11, så att jag vet var jag står.** `Hand` håller korten och räknar ut `Value` med ess som 11 eller 1 efter behov. Egenskaper för mjuk hand, sprucken hand och naturlig tjugoett samt `Clear()` är under arbete. Värdet visas ännu inte under en spelrunda eftersom kortutdelningen och rundflödet inte är färdigkopplade. Hand-implementationen behöver fortfarande syntaxkontrolleras och testas.
+`Round` har grundläggande stöd för att ge en deltagare kort och kontrollera om handen gått över 21. Spelets fullständiga rundflöde är ännu inte färdigkopplat till `ConsoleUi`.
 
-Nästa steg är att bygga vidare på `Round` och koppla ihop kortutdelning, spelarens val och visning av handens värde via `ConsoleUi`.
+## Nästa steg
 
-`Deck.PrepareForNextRound()` finns nu, men behöver anropas mellan rundorna för att kontrollen av återstående kort ska användas i spelet.
+- Färdigställa `Round` med utdelning, spelarturer, givartur och utfallsberäkning.
+- Koppla rundflödet till `Game` och `ConsoleUi`, inklusive visning av handvärden.
+- Anropa `Deck.PrepareForNextRound()` mellan rundor.
+- Koppla `CardRenderer` till konsolens kortvisning och prova utseendet.
 
-Kortgrafikens `CardRenderer.Render(Card)` returnerar kortet som rader med dynamisk valör och färgsymbol. Renderaren behöver fortfarande kopplas till `ConsoleUi` och testas visuellt i konsolen.
+Projektet byggdes efter ändringen av spelarstatistiken med 0 fel. Bygget rapporterade en varning om att `Dealer.HoleCardRevealed` inte används.
 
 Arbetet sker på feature-brancher och integreras till `dev` via pull requests och kodgranskning.
