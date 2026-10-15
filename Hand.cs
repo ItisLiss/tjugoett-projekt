@@ -61,13 +61,11 @@ public class Hand
     public bool IsBlackJack => _cards.Count == 2 && Value == 21;
     public void AddCard(Card card)
     {
- public void AddCard(Card card)
-{
-    _cards.Add(card);
-}
+        _cards.Add(card);
+    }
 
-public void Clear()
-{
-    _cards.Clear();
-}
+    public void Clear()
+    {
+        _cards.Clear();
+    }
 }
