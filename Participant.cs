@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+
+namespace Kunskapskontroll3
+{
 public class Participant
 {
     public string Name { get; }
@@ -18,4 +22,5 @@ public class Participant
     {
         Hand = new Hand();
     }
+}
 }

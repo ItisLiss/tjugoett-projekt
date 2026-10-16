@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+
+namespace Kunskapskontroll3
+{
 public class Card
 {
     public Suit Suit { get; set; }
@@ -39,4 +43,5 @@ public class Card
 
         return $"{suitSymbol}{rankSymbol}";
     }
+}
 }
