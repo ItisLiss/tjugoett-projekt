@@ -20,13 +20,16 @@ public class BasicPlayerStrategy : IPlayerStrategy
         // Om spelaren har en hård hand med 12 poäng.
         if (!hand.IsSoft && hand.Value == 12)
         {
-            // Stanna om givaren visar 4, 5 eller 6.
-            if (dealerUpCard.Value >= 4 && dealerUpCard.Value <= 6)
+            // Strategitabell för hård 12.
+            // Givarens kort: 2, 3, 4, 5, 6, 7,8, 9, 10, ess.  
+            Move[] hard12Moves =
             {
-                return Move.Stand;
-            }
-             // Annars köper spelaren ett kort.
-             return Move.Hit;
+                Move.Hit, Move.Hit, Move.Stand,
+                Move.Stand, Move.Stand, Move.Hit,
+                Move.Hit, Move.Hit, Move.Hit, Move.Hit
+            };
+            int index = dealerUpCard.Value - 2;
+            return hard12Moves[index];
         }
         // Kontrollera om spelaren har en hård hand med 13-16 poäng.
         if (!hand.IsSoft && hand.Value >= 13 && hand.Value <= 16)
@@ -36,8 +39,22 @@ public class BasicPlayerStrategy : IPlayerStrategy
             {
                 return Move.Stand;
             }
-            // Annas köper spelaren ett kort.
+            // Annars köper spelaren ett kort.
             return Move.Hit;
+        }
+        // Köp kort om handen är mjuk och har högst 17 poäng.
+        if (hand.IsSoft && hand.Value <= 17)
+        {
+            return Move.Hit;
+        }
+        // Kontrollera om spelaren har mjuk 18.
+        if (hand.IsSoft && hand.Value == 18)
+        {
+            // köp kort om givaren visar 9, 10 eller ess.
+            if (dealerUpCard.Value >= 9)
+            {
+                return Move.Hit;
+            }
         }
         return Move.Stand;
         
