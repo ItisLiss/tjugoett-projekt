@@ -1,4 +1,3 @@
-
 namespace Kunskapskontroll3
 {
     public interface IPlayerStrategy

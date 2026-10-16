@@ -48,61 +48,152 @@ namespace Kunskapskontroll3
             Console.Write("\nVälj ett alternativ (1-3): ");
         }
 
-    public void StartNewGame()
+        public void StartNewGame()
     {
         Console.Clear();
         Console.WriteLine("--- NYTT SPEL ---");
         List<Player> players = AddPlayers();
 
-        Console.WriteLine("\nSpelare vid bordet:");
-        foreach (Player player in players)
-        {
-            Console.WriteLine(player.Name);
-        }
         Deck deck = new Deck();
         deck.Shuffle();
         Round round = new Round();
+
+        // 1. Skapa dealern och dela ut startkort (ett synligt, ett dolt)
+        Dealer dealer = new Dealer();
+        dealer.ReceiveCard(deck.DealCard()); // Det synliga kortet
+        dealer.ReceiveCard(deck.DealCard()); // Det dolda kortet
+
+        // 2. FASE 1: ALLA SPELARE SPELAR KLART
         foreach (Player player in players)
         {
-            Card card = deck.DealCard();
-            bool busted = round.GiveCardAndCheckBust(player, card);
+            Console.Clear();
+            Console.WriteLine($"\n--- {player.Name}s tur ---");
+            Console.WriteLine($"Dealerns synliga kort: ");
+            PrintCard(dealer.Hand.Cards[0]);
+            //{dealer.Hand.Cards[0].Rank} of {dealer.Hand.Cards[0].Suit}]");
+            Console.WriteLine("(Det andra kortet är dolt)");
 
-            Card secondCard = deck.DealCard();
-            busted = round.GiveCardAndCheckBust(player, secondCard);
+            // Dela ut två startkort
+            Card card1 = deck.DealCard();
+            bool busted = round.GiveCardAndCheckBust(player, card1);
+
+            Card card2 = deck.DealCard();
+            busted = round.GiveCardAndCheckBust(player, card2);
+
+            DisplayPlayerHand(player);
+
             if (busted)
             {
-                DisplayMessage("Du har spruckit!");
+                DisplayMessage("Du har spruckit på starthanden!");
+                continue;
             }
+
+            // Loop för spelardrag (Hit eller Stand)
             while (!busted)
             {
-                Console.Write("Köp kort (K) eller stanna (S)? ");
+                Console.Write("\nKöp kort (K) eller stanna (S)? ");
                 string? choice = Console.ReadLine();
+                
                 if (choice?.Trim().ToUpper() == "K")
                 {
                     Card newCard = deck.DealCard();
                     busted = round.GiveCardAndCheckBust(player, newCard);
-                    Console.WriteLine($"Dina poäng: {player.Hand.Value}");
+                    
+                    DisplayPlayerHand(player);
+
                     if (busted)
                     {
                         DisplayMessage("Du har spruckit!");
+                        break;
                     }
                 }
                 else if (choice?.Trim().ToUpper() == "S")
                 {
+                    Console.WriteLine($"{player.Name} stannar på {player.Hand.Value} poäng.");
                     break;
                 }
                 else
                 {
                     Console.WriteLine("Ogiltigt val. Välj K eller S.");
                 }
-
             }
+            
+            Console.WriteLine("\nTryck på valfri tangent för att gå vidare...");
+            Console.ReadKey();
         }
 
-        Console.WriteLine("Tryck på valfri tangent för att gå tillbaka till menyn.");
+        // 3. FASE 2: DEALERNS TUR
+        Console.Clear();
+        Console.WriteLine("\n==============================");
+        Console.WriteLine("       DEALERNS TUR           ");
+        Console.WriteLine("==============================");
+
+        round.PlayDealerTurn(dealer, deck);
+
+        Console.WriteLine($"\nDealerns sluthand (Poäng: {dealer.Hand.Value}):");
+        foreach (Card card in dealer.Hand.Cards)
+        {
+            PrintCard(card);
+            //Console.WriteLine($"  - {card.Rank} of {card.Suit}");
+        }
+
+        // 4. FASE 3: JÄMFÖR OCH VISA ALLA RESULTAT
+        Console.WriteLine("\n==============================");
+        Console.WriteLine("       SLUTRESULTAT           ");
+        Console.WriteLine("==============================");
+
+        foreach (Player player in players)
+        {
+            string result = round.DetermineWinner(player, dealer);
+            Console.Write($"\nSpelare: {player.Name} ({player.Hand.Value} poäng) -> ");
+            
+            if (result.Contains("Vunnit"))
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+            }
+            else if (result.Contains("Förlorat"))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+            }
+            
+            Console.WriteLine(result);
+            Console.ResetColor();
+        }
+
+        Console.WriteLine("\nTryck på valfri tangent för att gå tillbaka till menyn.");
         Console.ReadKey();
     }
 
+    // --- NY HJÄLPMETOD FÖR ATT VISA HANDEN SNYGGT ---
+    private void DisplayPlayerHand(Player player)
+    {
+        Console.WriteLine("\nDin hand:");
+        foreach (Card card in player.Hand.Cards)
+        {
+            //Console.WriteLine($"  - {card.Rank} of {card.Suit}");
+            PrintCard(card);
+        }
+
+        // Här använder vi handens inbyggda egenskaper som vi skapade tidigare!
+        Console.WriteLine($"Total poäng: {player.Hand.Value}");
+
+        if (player.Hand.IsBlackJack)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("  --> BLACKJACK!");
+            Console.ResetColor();
+        }
+        else if (player.Hand.IsSoft)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("  (Mjuk hand - ess räknas som 11 eller 1)");
+            Console.ResetColor();
+        }
+    }
         public List<Player> AddPlayers()
         {
             int playerCount = ReadPlayerCount();
@@ -164,5 +255,46 @@ namespace Kunskapskontroll3
                 Console.WriteLine("Namnet får inte vara tomt.");
             }
         }
+
+        private static string OutComeText(Outcome outcome) => outcome switch
+        {
+            Outcome.Win => "Vinst",
+            Outcome.Lose => "Förlust",
+            Outcome.Push => "Lika",
+            Outcome.Blackjack => "Blackjack",
+            _ => ""  
+        };
+
+        private void PrintCard(Card card)
+        {
+            // Gör om enum-värdet till en sträng (t.ex. "Hearts" -> "Hearts")
+            string suit = card.Suit.ToString();
+            
+            string suitSymbol = suit switch
+            {
+                "Hearts" or "Hjärter" => "♥",
+                "Diamonds" or "Ruter" => "♦",
+                "Spades" or "Spader" => "♠",
+                "Clubs" or "Klöver" => "♣",
+                _ => suit
+            };
+
+            if (suit.Equals("Hearts", StringComparison.OrdinalIgnoreCase) || 
+                suit.Equals("Diamonds", StringComparison.OrdinalIgnoreCase) ||
+                suit.Equals("Hjärter", StringComparison.OrdinalIgnoreCase) || 
+                suit.Equals("Ruter", StringComparison.OrdinalIgnoreCase))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Gray;
+            }
+
+            Console.WriteLine($"  [{card.Rank} {suitSymbol}]");
+            Console.ResetColor();
+        }
+
     }
+    
 }
