@@ -49,121 +49,142 @@ namespace Kunskapskontroll3
         }
 
         public void StartNewGame()
-    {
-        Console.Clear();
-        Console.WriteLine("--- NYTT SPEL ---");
-        List<Player> players = AddPlayers();
-
-        Deck deck = new Deck();
-        deck.Shuffle();
-        Round round = new Round();
-
-        // 1. Skapa dealern och dela ut startkort (ett synligt, ett dolt)
-        Dealer dealer = new Dealer();
-        dealer.ReceiveCard(deck.DealCard()); // Det synliga kortet
-        dealer.ReceiveCard(deck.DealCard()); // Det dolda kortet
-
-        // 2. FASE 1: ALLA SPELARE SPELAR KLART
-        foreach (Player player in players)
         {
             Console.Clear();
-            Console.WriteLine($"\n--- {player.Name}s tur ---");
-            Console.WriteLine($"Dealerns synliga kort: ");
-            PrintCard(dealer.Hand.Cards[0]);
-            //{dealer.Hand.Cards[0].Rank} of {dealer.Hand.Cards[0].Suit}]");
-            Console.WriteLine("(Det andra kortet är dolt)");
+            Console.WriteLine("--- NYTT SPEL ---");
+            List<Player> players = AddPlayers();
 
-            // Dela ut två startkort
-            Card card1 = deck.DealCard();
-            bool busted = round.GiveCardAndCheckBust(player, card1);
-
-            Card card2 = deck.DealCard();
-            busted = round.GiveCardAndCheckBust(player, card2);
-
-            DisplayPlayerHand(player);
-
-            if (busted)
+            Deck deck = new Deck();
+            deck.Shuffle();
+            bool spelaFleraRundor = true;
+            while (spelaFleraRundor)
             {
-                DisplayMessage("Du har spruckit på starthanden!");
-                continue;
-            }
+                deck.PrepareForNextRound();
 
-            // Loop för spelardrag (Hit eller Stand)
-            while (!busted)
-            {
-                Console.Write("\nKöp kort (K) eller stanna (S)? ");
-                string? choice = Console.ReadLine();
-                
-                if (choice?.Trim().ToUpper() == "K")
+            
+                foreach (Player player in players)
                 {
-                    Card newCard = deck.DealCard();
-                    busted = round.GiveCardAndCheckBust(player, newCard);
-                    
+                    player.NewHand();
+                }
+                Round round = new Round();
+
+                // 1. Skapa dealern och dela ut startkort (ett synligt, ett dolt)
+                Dealer dealer = new Dealer();
+                dealer.ReceiveCard(deck.DealCard()); // Det synliga kortet
+                dealer.ReceiveCard(deck.DealCard()); // Det dolda kortet
+
+                // 2. FASE 1: ALLA SPELARE SPELAR KLART
+                foreach (Player player in players)
+                {
+                    Console.Clear();
+                    Console.WriteLine($"\n--- {player.Name}s tur ---");
+                    Console.WriteLine($"Dealerns synliga kort: ");
+                    PrintCard(dealer.Hand.Cards[0]);
+                    Console.WriteLine("(Det andra kortet är dolt)");
+
+                    // Dela ut två startkort
+                    Card card1 = deck.DealCard();
+                    bool busted = round.GiveCardAndCheckBust(player, card1);
+
+                    Card card2 = deck.DealCard();
+                    busted = round.GiveCardAndCheckBust(player, card2);
+
                     DisplayPlayerHand(player);
 
                     if (busted)
                     {
-                        DisplayMessage("Du har spruckit!");
-                        break;
+                        DisplayMessage("Du har spruckit på starthanden!");
+                        continue;
                     }
+
+                    // Loop för spelardrag (Hit eller Stand)
+                    while (!busted)
+                    {
+                        Console.Write("\nKöp kort (K) eller stanna (S)? ");
+                        string? choice = Console.ReadLine();
+                        
+                        if (choice?.Trim().ToUpper() == "K")
+                        {
+                            Card newCard = deck.DealCard();
+                            busted = round.GiveCardAndCheckBust(player, newCard);
+                            
+                            DisplayPlayerHand(player);
+
+                            if (busted)
+                            {
+                                DisplayMessage("Du har spruckit!");
+                                break;
+                            }
+                        }
+                        else if (choice?.Trim().ToUpper() == "S")
+                        {
+                            Console.WriteLine($"{player.Name} stannar på {player.Hand.Value} poäng.");
+                            break;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Ogiltigt val. Välj K eller S.");
+                        }
+                    }
+                    
+                    Console.WriteLine("\nTryck på valfri tangent för att gå vidare...");
+                    Console.ReadKey();
                 }
-                else if (choice?.Trim().ToUpper() == "S")
+
+                // 3. FASE 2: DEALERNS TUR
+                Console.Clear();
+                Console.WriteLine("\n==============================");
+                Console.WriteLine("       DEALERNS TUR           ");
+                Console.WriteLine("==============================");
+
+                round.PlayDealerTurn(dealer, deck);
+
+                Console.WriteLine($"\nDealerns sluthand (Poäng: {dealer.Hand.Value}):");
+                foreach (Card card in dealer.Hand.Cards)
                 {
-                    Console.WriteLine($"{player.Name} stannar på {player.Hand.Value} poäng.");
-                    break;
+                    PrintCard(card);
+                    //Console.WriteLine($"  - {card.Rank} of {card.Suit}");
+                }
+
+                // 4. FASE 3: JÄMFÖR OCH VISA ALLA RESULTAT
+                Console.WriteLine("\n==============================");
+                Console.WriteLine("       SLUTRESULTAT           ");
+                Console.WriteLine("==============================");
+
+                foreach (Player player in players)
+                {
+                    string result = round.DetermineWinner(player, dealer);
+                    Console.Write($"\nSpelare: {player.Name} ({player.Hand.Value} poäng) -> ");
+                    
+                    if (result.Contains("Vunnit"))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                    }
+                    else if (result.Contains("Förlorat"))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                    }
+                    
+                    Console.WriteLine(result);
+                    Console.ResetColor();
+                }
+                Console.WriteLine("\n--------------------------------------------");
+                Console.WriteLine("Vill ni spela en till runda? (J/N)");
+                string? svar = Console.ReadLine();
+                if(svar?.Trim().ToLower() != "j" && svar?.Trim().ToLower() != "ja" )
+                {
+                    spelaFleraRundor = false;
                 }
                 else
                 {
-                    Console.WriteLine("Ogiltigt val. Välj K eller S.");
+                    Console.Clear();
+                    Console.WriteLine("--- Ny runda startar nu ---");
                 }
             }
-            
-            Console.WriteLine("\nTryck på valfri tangent för att gå vidare...");
-            Console.ReadKey();
-        }
-
-        // 3. FASE 2: DEALERNS TUR
-        Console.Clear();
-        Console.WriteLine("\n==============================");
-        Console.WriteLine("       DEALERNS TUR           ");
-        Console.WriteLine("==============================");
-
-        round.PlayDealerTurn(dealer, deck);
-
-        Console.WriteLine($"\nDealerns sluthand (Poäng: {dealer.Hand.Value}):");
-        foreach (Card card in dealer.Hand.Cards)
-        {
-            PrintCard(card);
-            //Console.WriteLine($"  - {card.Rank} of {card.Suit}");
-        }
-
-        // 4. FASE 3: JÄMFÖR OCH VISA ALLA RESULTAT
-        Console.WriteLine("\n==============================");
-        Console.WriteLine("       SLUTRESULTAT           ");
-        Console.WriteLine("==============================");
-
-        foreach (Player player in players)
-        {
-            string result = round.DetermineWinner(player, dealer);
-            Console.Write($"\nSpelare: {player.Name} ({player.Hand.Value} poäng) -> ");
-            
-            if (result.Contains("Vunnit"))
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-            }
-            else if (result.Contains("Förlorat"))
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-            }
-            else
-            {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-            }
-            
-            Console.WriteLine(result);
-            Console.ResetColor();
-        }
-
         Console.WriteLine("\nTryck på valfri tangent för att gå tillbaka till menyn.");
         Console.ReadKey();
     }
