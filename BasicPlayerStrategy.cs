@@ -34,13 +34,16 @@ public class BasicPlayerStrategy : IPlayerStrategy
         // Kontrollera om spelaren har en hård hand med 13-16 poäng.
         if (!hand.IsSoft && hand.Value >= 13 && hand.Value <= 16)
         {
-            // Stanna om givaren visar 2 till 6.
-            if (dealerUpCard.Value >= 2 && dealerUpCard.Value <= 6)
+            // Strategitabell för hård 13-16.
+            // Givarens kort: 2, 3, 4, 5, 6, 7, 8, 9, 10, ess.
+            Move[] hard13To16Moves =
             {
-                return Move.Stand;
-            }
-            // Annars köper spelaren ett kort.
-            return Move.Hit;
+                Move.Stand, Move.Stand, Move.Stand,
+                Move.Stand, Move.Stand, Move.Hit,
+                Move.Hit, Move.Hit, Move.Hit, Move.Hit
+            };
+            int index = dealerUpCard.Value - 2;
+            return hard13To16Moves[index];
         }
         // Köp kort om handen är mjuk och har högst 17 poäng.
         if (hand.IsSoft && hand.Value <= 17)
