@@ -53,11 +53,18 @@ public class BasicPlayerStrategy : IPlayerStrategy
         // Kontrollera om spelaren har mjuk 18.
         if (hand.IsSoft && hand.Value == 18)
         {
-            // köp kort om givaren visar 9, 10 eller ess.
-            if (dealerUpCard.Value >= 9)
+            // Strategitabell för mjukt 18 när givaren visar 2 till ess.
+            // De första sju värdena betyder Stand, de sista tre betyder Hit.
+            Move[] soft18Moves =
             {
-                return Move.Hit;
-            }
+                Move.Stand, Move.Stand, Move.Stand, Move.Stand, Move.Stand,
+                Move.Stand, Move.Stand, Move.Hit, Move.Hit, Move.Hit
+            };
+            // Räknar ut vilken plats i tabellen som motsvarar givarens kort.
+            int index = dealerUpCard.Value - 2;
+            // Hämtar rätt beslut Hit eller Stand från strategitabellen
+            return soft18Moves[index];    
+            
         }
         return Move.Stand;
         
