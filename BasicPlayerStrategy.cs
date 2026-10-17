@@ -7,21 +7,18 @@ public class BasicPlayerStrategy : IPlayerStrategy
     // Utifrån spelarens hand och givarens synliga kort.
     public Move ChooseMove(Hand hand, Card dealerUpCard)
     {
-        // Köp kort om handen är hård och har högst 8 poäng.
-        if (!hand.IsSoft && hand.Value <= 8)
-        {
-            return Move.Hit;
-        }
-        // Köp kort om handen är hård och har 9 till 11 poäng.
-        if (!hand.IsSoft && hand.Value >= 9 && hand.Value <= 11)
-        {
+        
+        // Köp kort om handen är hård och har högst 11 poäng.
+        if (!hand.IsSoft && hand.Value <= 11)
+        { 
+            // Datorspelare väljer att köpa ett kort
             return Move.Hit;
         }
         // Om spelaren har en hård hand med 12 poäng.
         if (!hand.IsSoft && hand.Value == 12)
         {
             // Strategitabell för hård 12.
-            // Givarens kort: 2, 3, 4, 5, 6, 7,8, 9, 10, ess.  
+            // Givarens kort: 2, 3, 4, 5, 6, 7 ,8, 9, 10, ess.  
             Move[] hard12Moves =
             {
                 Move.Hit, Move.Hit, Move.Stand,

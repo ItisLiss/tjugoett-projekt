@@ -49,169 +49,173 @@ namespace Kunskapskontroll3
         }
 
         public void StartNewGame()
-    {
-        Console.Clear();
-        Console.WriteLine("--- NYTT SPEL ---");
-        List<Player> players = AddPlayers();
-
-        Deck deck = new Deck();
-        deck.Shuffle();
-        Round round = new Round();
-
-        // 1. Skapa dealern och dela ut startkort (ett synligt, ett dolt)
-        Dealer dealer = new Dealer();
-        dealer.ReceiveCard(deck.DealCard()); // Det synliga kortet
-        dealer.ReceiveCard(deck.DealCard()); // Det dolda kortet
-
-        // 2. FASE 1: ALLA SPELARE SPELAR KLART
-        foreach (Player player in players)
         {
             Console.Clear();
-            Console.WriteLine($"\n--- {player.Name}s tur ---");
-            Console.WriteLine($"Dealerns synliga kort: ");
-            PrintCard(dealer.Hand.Cards[0]);
-            //{dealer.Hand.Cards[0].Rank} of {dealer.Hand.Cards[0].Suit}]");
-            Console.WriteLine("(Det andra kortet är dolt)");
+            Console.WriteLine("--- NYTT SPEL ---");
+            List<Player> players = AddPlayers();
 
-            // Dela ut två startkort
-            Card card1 = deck.DealCard();
-            bool busted = round.GiveCardAndCheckBust(player, card1);
+            Deck deck = new Deck();
+            deck.Shuffle();
+            Round round = new Round();
 
-            Card card2 = deck.DealCard();
-            busted = round.GiveCardAndCheckBust(player, card2);
+            // 1. Skapa dealern och dela ut startkort (ett synligt, ett dolt)
+            Dealer dealer = new Dealer();
+            dealer.ReceiveCard(deck.DealCard()); // Det synliga kortet
+            dealer.ReceiveCard(deck.DealCard()); // Det dolda kortet
 
-            DisplayPlayerHand(player);
-
-            if (busted)
+            // 2. FASE 1: ALLA SPELARE SPELAR KLART
+            foreach (Player player in players)
             {
-                DisplayMessage("Du har spruckit på starthanden!");
-                continue;
-            }
+                Console.Clear();
+                Console.WriteLine($"\n--- {player.Name}s tur ---");
+                Console.WriteLine($"Dealerns synliga kort: ");
+                PrintCard(dealer.Hand.Cards[0]);
+                //{dealer.Hand.Cards[0].Rank} of {dealer.Hand.Cards[0].Suit}]");
+                Console.WriteLine("(Det andra kortet är dolt)");
 
-            // Loop för spelardrag (Hit eller Stand)
-            while (!busted)
-            {
-                // Kontrollerar om spelaren är en dator som har en strategy.
-                bool isComputer = player.Strategy != null;
-                // Sparar spelarens val
-                string? choice;
-                if (isComputer)
+                // Dela ut två startkort
+                Card card1 = deck.DealCard();
+                bool busted = round.GiveCardAndCheckBust(player, card1);
+
+                Card card2 = deck.DealCard();
+                busted = round.GiveCardAndCheckBust(player, card2);
+
+                DisplayPlayerHand(player);
+
+                if (busted)
+                {
+                    DisplayMessage("Du har spruckit på starthanden!");
+                    continue;
+                }
+
+                // Loop för spelardrag (Hit eller Stand)
+                while (!busted)
+                {
+                    // Kontrollerar om spelaren är en dator som har en strategy.
+                    bool isComputer = player.Strategy != null;
+                    // Sparar spelarens val
+                    string? choice;
+                    if (isComputer)
                     {
                         // Låter datorns strategi välja Hit eller Stand.
                         Move move = player.Strategy!.ChooseMove(player.Hand, dealer.Hand.Cards[0]);
                         // Omvandlar Hit till K och Stand till S.
                         choice = move == Move.Hit ? "K" : "S";
-                        // Visar vilken drag datorn valde.
-                        Console.WriteLine($"{player.Name} väljer {move}.");
+                        // Visar när datorspelaren väljer att köpa ett kort.
+                        if (move == Move.Hit)
+                        {
+                            Console.WriteLine($"{player.Name} köper ett kort.");
+                        }
                     }
+
                     else
                     {
                         // Låter en mänsklig spelare välja själv.
                         Console.Write("\nKöp kort (K) eller stanna (S)? ");
                         choice = Console.ReadLine();
                     }
-                
-                
-                if (choice?.Trim().ToUpper() == "K")
-                {
-                    Card newCard = deck.DealCard();
-                    busted = round.GiveCardAndCheckBust(player, newCard);
-                    
-                    DisplayPlayerHand(player);
 
-                    if (busted)
+
+                    if (choice?.Trim().ToUpper() == "K")
                     {
-                        DisplayMessage("Du har spruckit!");
+                        Card newCard = deck.DealCard();
+                        busted = round.GiveCardAndCheckBust(player, newCard);
+
+                        DisplayPlayerHand(player);
+
+                        if (busted)
+                        {
+                            DisplayMessage("Du har spruckit!");
+                            break;
+                        }
+                    }
+                    else if (choice?.Trim().ToUpper() == "S")
+                    {
+                        Console.WriteLine($"{player.Name} stannar på {player.Hand.Value} poäng.");
                         break;
                     }
+                    else
+                    {
+                        Console.WriteLine("Ogiltigt val. Välj K eller S.");
+                    }
                 }
-                else if (choice?.Trim().ToUpper() == "S")
+
+                Console.WriteLine("\nTryck på valfri tangent för att gå vidare...");
+                Console.ReadKey();
+            }
+
+            // 3. FASE 2: DEALERNS TUR
+            Console.Clear();
+            Console.WriteLine("\n==============================");
+            Console.WriteLine("       DEALERNS TUR           ");
+            Console.WriteLine("==============================");
+
+            round.PlayDealerTurn(dealer, deck);
+
+            Console.WriteLine($"\nDealerns sluthand (Poäng: {dealer.Hand.Value}):");
+            foreach (Card card in dealer.Hand.Cards)
+            {
+                PrintCard(card);
+                //Console.WriteLine($"  - {card.Rank} of {card.Suit}");
+            }
+
+            // 4. FASE 3: JÄMFÖR OCH VISA ALLA RESULTAT
+            Console.WriteLine("\n==============================");
+            Console.WriteLine("       SLUTRESULTAT           ");
+            Console.WriteLine("==============================");
+
+            foreach (Player player in players)
+            {
+                string result = round.DetermineWinner(player, dealer);
+                Console.Write($"\nSpelare: {player.Name} ({player.Hand.Value} poäng) -> ");
+
+                if (result.Contains("Vunnit"))
                 {
-                    Console.WriteLine($"{player.Name} stannar på {player.Hand.Value} poäng.");
-                    break;
+                    Console.ForegroundColor = ConsoleColor.Green;
+                }
+                else if (result.Contains("Förlorat"))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
                 }
                 else
                 {
-                    Console.WriteLine("Ogiltigt val. Välj K eller S.");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
                 }
+
+                Console.WriteLine(result);
+                Console.ResetColor();
             }
-            
-            Console.WriteLine("\nTryck på valfri tangent för att gå vidare...");
+
+            Console.WriteLine("\nTryck på valfri tangent för att gå tillbaka till menyn.");
             Console.ReadKey();
         }
 
-        // 3. FASE 2: DEALERNS TUR
-        Console.Clear();
-        Console.WriteLine("\n==============================");
-        Console.WriteLine("       DEALERNS TUR           ");
-        Console.WriteLine("==============================");
-
-        round.PlayDealerTurn(dealer, deck);
-
-        Console.WriteLine($"\nDealerns sluthand (Poäng: {dealer.Hand.Value}):");
-        foreach (Card card in dealer.Hand.Cards)
+        // --- NY HJÄLPMETOD FÖR ATT VISA HANDEN SNYGGT ---
+        private void DisplayPlayerHand(Player player)
         {
-            PrintCard(card);
-            //Console.WriteLine($"  - {card.Rank} of {card.Suit}");
-        }
+            Console.WriteLine("\nDin hand:");
+            foreach (Card card in player.Hand.Cards)
+            {
+                //Console.WriteLine($"  - {card.Rank} of {card.Suit}");
+                PrintCard(card);
+            }
 
-        // 4. FASE 3: JÄMFÖR OCH VISA ALLA RESULTAT
-        Console.WriteLine("\n==============================");
-        Console.WriteLine("       SLUTRESULTAT           ");
-        Console.WriteLine("==============================");
+            // Här använder vi handens inbyggda egenskaper som vi skapade tidigare!
+            Console.WriteLine($"Total poäng: {player.Hand.Value}");
 
-        foreach (Player player in players)
-        {
-            string result = round.DetermineWinner(player, dealer);
-            Console.Write($"\nSpelare: {player.Name} ({player.Hand.Value} poäng) -> ");
-            
-            if (result.Contains("Vunnit"))
+            if (player.Hand.IsBlackJack)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("  --> BLACKJACK!");
+                Console.ResetColor();
             }
-            else if (result.Contains("Förlorat"))
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-            }
-            else
+            else if (player.Hand.IsSoft)
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("  (Mjuk hand - ess räknas som 11 eller 1)");
+                Console.ResetColor();
             }
-            
-            Console.WriteLine(result);
-            Console.ResetColor();
         }
-
-        Console.WriteLine("\nTryck på valfri tangent för att gå tillbaka till menyn.");
-        Console.ReadKey();
-    }
-
-    // --- NY HJÄLPMETOD FÖR ATT VISA HANDEN SNYGGT ---
-    private void DisplayPlayerHand(Player player)
-    {
-        Console.WriteLine("\nDin hand:");
-        foreach (Card card in player.Hand.Cards)
-        {
-            //Console.WriteLine($"  - {card.Rank} of {card.Suit}");
-            PrintCard(card);
-        }
-
-        // Här använder vi handens inbyggda egenskaper som vi skapade tidigare!
-        Console.WriteLine($"Total poäng: {player.Hand.Value}");
-
-        if (player.Hand.IsBlackJack)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("  --> BLACKJACK!");
-            Console.ResetColor();
-        }
-        else if (player.Hand.IsSoft)
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("  (Mjuk hand - ess räknas som 11 eller 1)");
-            Console.ResetColor();
-        }
-    }
         public List<Player> AddPlayers()
         {
             int playerCount = ReadPlayerCount();
@@ -227,33 +231,33 @@ namespace Kunskapskontroll3
             // Försöker omvandla användarens svar till ett heltal.
             bool success = int.TryParse(input, out int computerCount);
             // Kontrollerar om användaren skrev ett ogiltigt tal eller negativt antal
-             while (!success || computerCount < 0)
-             {
-                   
-                       // Visar ett felmaddelande om antalet är ogiltigt
-                       Console.WriteLine("Ogiltigt antal datorspelare.");
-                       // Ber användaren skriva ett nytt antal
-                       Console.Write("Ange antal datorspelare igen: ");
-                       input = Console.ReadLine();
-                       // Försöker omvandla det nya svaret till ett heltal.
-                       success = int.TryParse(input, out computerCount);
-                
-             }
-             // Upprepar koden en gång för varje datorspelare.
-             for (int i = 0; i < computerCount; i++)
+            while (!success || computerCount < 0)
+            {
+
+                // Visar ett felmeddelande om antalet är ogiltigt
+                Console.WriteLine("Ogiltigt antal datorspelare.");
+                // Ber användaren skriva ett nytt antal
+                Console.Write("Ange antal datorspelare igen: ");
+                input = Console.ReadLine();
+                // Försöker omvandla det nya svaret till ett heltal.
+                success = int.TryParse(input, out computerCount);
+
+            }
+            // Upprepar koden en gång för varje datorspelare.
+            for (int i = 0; i < computerCount; i++)
             {
                 // Skapar en ny datorspelare med ett automatiskt namn
                 Player bot = new Player($"Datorspelare {i + 1}");
                 // Ger datorspelaren en enkel strategy för att välja Hit eller Stand
                 if (i % 2 == 0)
                 {
-                        bot.Strategy = new SimplePlayerStrategy();
+                    bot.Strategy = new SimplePlayerStrategy();
                 }
                 else
                 {
                     bot.Strategy = new BasicPlayerStrategy();
                 }
-                 // Lägger till datorspelaren i listan med alla spelare.
+                // Lägger till datorspelaren i listan med alla spelare.
                 players.Add(bot);
             }
             return players;
@@ -313,14 +317,14 @@ namespace Kunskapskontroll3
             Outcome.Lose => "Förlust",
             Outcome.Push => "Lika",
             Outcome.Blackjack => "Blackjack",
-            _ => ""  
+            _ => ""
         };
 
         private void PrintCard(Card card)
         {
             // Gör om enum-värdet till en sträng (t.ex. "Hearts" -> "Hearts")
             string suit = card.Suit.ToString();
-            
+
             string suitSymbol = suit switch
             {
                 "Hearts" or "Hjärter" => "♥",
@@ -330,9 +334,9 @@ namespace Kunskapskontroll3
                 _ => suit
             };
 
-            if (suit.Equals("Hearts", StringComparison.OrdinalIgnoreCase) || 
+            if (suit.Equals("Hearts", StringComparison.OrdinalIgnoreCase) ||
                 suit.Equals("Diamonds", StringComparison.OrdinalIgnoreCase) ||
-                suit.Equals("Hjärter", StringComparison.OrdinalIgnoreCase) || 
+                suit.Equals("Hjärter", StringComparison.OrdinalIgnoreCase) ||
                 suit.Equals("Ruter", StringComparison.OrdinalIgnoreCase))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
@@ -347,5 +351,5 @@ namespace Kunskapskontroll3
         }
 
     }
-    
+
 }
