@@ -53,10 +53,21 @@ namespace Kunskapskontroll3
             Console.Clear();
             Console.WriteLine("--- NYTT SPEL ---");
             List<Player> players = AddPlayers();
-
+        
+            
             Deck deck = new Deck();
             deck.Shuffle();
-            Round round = new Round();
+            bool spelaFleraRundor = true;
+            while (spelaFleraRundor)
+            {
+                deck.PrepareForNextRound();
+
+            
+                foreach (Player player in players)
+                {
+                    player.NewHand();
+                }
+                Round round = new Round();
 
             // 1. Skapa dealern och dela ut startkort (ett synligt, ett dolt)
             Dealer dealer = new Dealer();
@@ -164,31 +175,43 @@ namespace Kunskapskontroll3
             Console.WriteLine("       SLUTRESULTAT           ");
             Console.WriteLine("==============================");
 
-            foreach (Player player in players)
-            {
-                string result = round.DetermineWinner(player, dealer);
-                Console.Write($"\nSpelare: {player.Name} ({player.Hand.Value} poäng) -> ");
-
-                if (result.Contains("Vunnit"))
+                foreach (Player player in players)
                 {
-                    Console.ForegroundColor = ConsoleColor.Green;
+                    string result = round.DetermineWinner(player, dealer);
+                    Console.Write($"\nSpelare: {player.Name} ({player.Hand.Value} poäng) -> ");
+                    
+                    if (result.Contains("Vunnit"))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                    }
+                    else if (result.Contains("Förlorat"))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                    }
+                    
+                    Console.WriteLine(result);
+                    Console.ResetColor();
                 }
-                else if (result.Contains("Förlorat"))
+                Console.WriteLine("\n--------------------------------------------");
+                Console.WriteLine("Vill ni spela en till runda? (J/N)");
+                string? svar = Console.ReadLine();
+                if(svar?.Trim().ToLower() != "j" && svar?.Trim().ToLower() != "ja" )
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
+                    spelaFleraRundor = false;
                 }
                 else
                 {
-                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Clear();
+                    Console.WriteLine("--- Ny runda startar nu ---");
                 }
-
-                Console.WriteLine(result);
-                Console.ResetColor();
             }
-
-            Console.WriteLine("\nTryck på valfri tangent för att gå tillbaka till menyn.");
-            Console.ReadKey();
-        }
+        Console.WriteLine("\nTryck på valfri tangent för att gå tillbaka till menyn.");
+        Console.ReadKey();
+    }
 
         // --- NY HJÄLPMETOD FÖR ATT VISA HANDEN SNYGGT ---
         private void DisplayPlayerHand(Player player)
