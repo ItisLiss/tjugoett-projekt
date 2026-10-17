@@ -91,8 +91,26 @@ namespace Kunskapskontroll3
             // Loop för spelardrag (Hit eller Stand)
             while (!busted)
             {
-                Console.Write("\nKöp kort (K) eller stanna (S)? ");
-                string? choice = Console.ReadLine();
+                // Kontrollerar om spelaren är en dator som har en strategy.
+                bool isComputer = player.Strategy != null;
+                // Sparar spelarens val
+                string? choice;
+                if (isComputer)
+                    {
+                        // Låter datorns strategi välja Hit eller Stand.
+                        Move move = player.Strategy!.ChooseMove(player.Hand, dealer.Hand.Cards[0]);
+                        // Omvandlar Hit till K och Stand till S.
+                        choice = move == Move.Hit ? "K" : "S";
+                        // Visar vilken drag datorn valde.
+                        Console.WriteLine($"{player.Name} väljer {move}.");
+                    }
+                    else
+                    {
+                        // Låter en mänsklig spelare välja själv.
+                        Console.Write("\nKöp kort (K) eller stanna (S)? ");
+                        choice = Console.ReadLine();
+                    }
+                
                 
                 if (choice?.Trim().ToUpper() == "K")
                 {
@@ -204,7 +222,40 @@ namespace Kunskapskontroll3
                 string name = ReadPlayerName(i + 1);
                 players.Add(new Player(name));
             }
-
+            Console.Write("Hur många datorspelare vill du lägga till? (0 för inga): ");
+            string? input = Console.ReadLine();
+            // Försöker omvandla användarens svar till ett heltal.
+            bool success = int.TryParse(input, out int computerCount);
+            // Kontrollerar om användaren skrev ett ogiltigt tal eller negativt antal
+             while (!success || computerCount < 0)
+             {
+                   
+                       // Visar ett felmaddelande om antalet är ogiltigt
+                       Console.WriteLine("Ogiltigt antal datorspelare.");
+                       // Ber användaren skriva ett nytt antal
+                       Console.Write("Ange antal datorspelare igen: ");
+                       input = Console.ReadLine();
+                       // Försöker omvandla det nya svaret till ett heltal.
+                       success = int.TryParse(input, out computerCount);
+                
+             }
+             // Upprepar koden en gång för varje datorspelare.
+             for (int i = 0; i < computerCount; i++)
+            {
+                // Skapar en ny datorspelare med ett automatiskt namn
+                Player bot = new Player($"Datorspelare {i + 1}");
+                // Ger datorspelaren en enkel strategy för att välja Hit eller Stand
+                if (i % 2 == 0)
+                {
+                        bot.Strategy = new SimplePlayerStrategy();
+                }
+                else
+                {
+                    bot.Strategy = new BasicPlayerStrategy();
+                }
+                 // Lägger till datorspelaren i listan med alla spelare.
+                players.Add(bot);
+            }
             return players;
         }
 
