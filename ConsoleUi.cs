@@ -217,11 +217,7 @@ namespace Kunskapskontroll3
         private void DisplayPlayerHand(Player player)
         {
             Console.WriteLine("\nDin hand:");
-            foreach (Card card in player.Hand.Cards)
-            {
-                //Console.WriteLine($"  - {card.Rank} of {card.Suit}");
-                PrintCard(card);
-            }
+            PrintCardsSideBySide(player.Hand.Cards);
 
             // Här använder vi handens inbyggda egenskaper som vi skapade tidigare!
             Console.WriteLine($"Total poäng: {player.Hand.Value}");
@@ -239,6 +235,38 @@ namespace Kunskapskontroll3
                 Console.ResetColor();
             }
         }
+
+        private void PrintCardsSideBySide(IEnumerable<Card> cards)
+        {
+            CardRenderer renderer = new();
+            List<string[]> renderedCards = new();
+
+            foreach (Card card in cards)
+            {
+                renderedCards.Add(renderer.Render(card));
+            }
+
+            PrintCardRowsSideBySide(renderedCards);
+        }
+
+        private void PrintCardRowsSideBySide(List<string[]> renderedCards)
+        {
+            if (renderedCards.Count == 0)
+            {
+                return;
+            }
+
+            for (int row = 0; row < renderedCards[0].Length; row++)
+            {
+                foreach (string[] cardRows in renderedCards)
+                {
+                    Console.Write(cardRows[row] + " ");
+                }
+
+                Console.WriteLine();
+            }
+        }
+
         public List<Player> AddPlayers()
         {
             int playerCount = ReadPlayerCount();
