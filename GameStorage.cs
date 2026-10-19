@@ -12,7 +12,7 @@ namespace Kunskapskontroll3
 
             foreach (Player player in players)
             {
-                string line = $"{player.Name};{player.Wins};{player.Losses};{player.Blackjacks}";
+                string line = $"{player.Name};{player.Wins};{player.Losses};{player.Blackjacks};{player.Chips}";
                 lines.Add(line);
             }
 
@@ -33,9 +33,9 @@ namespace Kunskapskontroll3
             {
                 string[] parts = line.Split(';');
 
-                if (parts.Length != 4)
+                if (parts.Length != 5)
                 {
-                    throw new InvalidDataException("En spelarrad måste innehålla exakt fyra fält.");
+                    throw new InvalidDataException("En spelarrad måste innehålla exakt fem fält.");
                 }
 
                 if (string.IsNullOrWhiteSpace(parts[0]))
@@ -46,12 +46,13 @@ namespace Kunskapskontroll3
                 if (!int.TryParse(parts[1], out int wins) ||
                     !int.TryParse(parts[2], out int losses) ||
                     !int.TryParse(parts[3], out int blackjacks) ||
-                    wins < 0 || losses < 0 || blackjacks < 0)
+                    !int.TryParse(parts[4], out int chips) ||
+                    wins < 0 || losses < 0 || blackjacks < 0 || chips < 0)
                 {
                     throw new InvalidDataException("En spelarrad innehåller ogiltig statistik.");
                 }
 
-                players.Add(new Player(parts[0].Trim(), wins, losses, blackjacks));
+                players.Add(new Player(parts[0].Trim(), wins, losses, blackjacks, chips));
             }
 
             return players;
