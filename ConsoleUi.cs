@@ -83,6 +83,7 @@ namespace Kunskapskontroll3
                     Console.WriteLine("(Det andra kortet är dolt)");
 
                     // Dela ut två startkort
+                    deck.PrepareForNextRound();
                     Card card1 = deck.DealCard();
                     bool busted = round.GiveCardAndCheckBust(player, card1);
 

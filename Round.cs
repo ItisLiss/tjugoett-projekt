@@ -24,7 +24,7 @@ class Round
         public void PlayDealerTurn(Dealer dealer, Deck deck)
         {
             // Dealern drar kort så länge poängen är under 17
-            while (dealer.Hand.Value < 17)
+            while (dealer.Hand.Value < 17 || (dealer.Hand.Value == 17 && dealer.Hand.IsSoft && Config.ShouldHitOnSoft))
             {
                 Card card = deck.DealCard();
                 dealer.ReceiveCard(card);

@@ -9,11 +9,14 @@ namespace Kunskapskontroll3
 
         public Deck()
         {
-            foreach (Suit suit in Enum.GetValues<Suit>())
+            for(int i = 0; i < Config.DeckCount; i++)
             {
-                foreach (Rank rank in Enum.GetValues<Rank>())
+                foreach (Suit suit in Enum.GetValues<Suit>())
                 {
-                    cards.Add(new Card(suit, rank));
+                    foreach (Rank rank in Enum.GetValues<Rank>())
+                    {
+                        cards.Add(new Card(suit, rank));
+                    }
                 }
             }
             Shuffle();
@@ -46,23 +49,22 @@ namespace Kunskapskontroll3
         {
             return cards.Count;
         }
-    public void PrepareForNextRound()
-    {
-        if (cards.Count < 15)
+        public void PrepareForNextRound()
         {
-            cards.Clear();
-
-            foreach (Suit suit in Enum.GetValues<Suit>())
+            if (cards.Count < Config.MinDeckCardAmount)
             {
-                foreach (Rank rank in Enum.GetValues<Rank>())
-                {
-                    cards.Add(new Card(suit, rank));
-                }
-            }
+                cards.Clear();
 
-            Shuffle();
+                foreach (Suit suit in Enum.GetValues<Suit>())
+                {
+                    foreach (Rank rank in Enum.GetValues<Rank>())
+                    {
+                        cards.Add(new Card(suit, rank));
+                    }
+                }
+
+                Shuffle();
+            }
         }
     }
-
-}
 }
