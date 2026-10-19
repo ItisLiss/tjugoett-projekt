@@ -1,39 +1,75 @@
-using System.Collections.Generic;
-
 namespace Kunskapskontroll3
 {
-class CardRenderer
-{
-    public string[] Render(Card card)
+    class CardRenderer
     {
-        string rankSymbol = card.Rank switch
+        public string[] Render(Card card)
         {
-            Rank.Ace => "A",
-            Rank.King => "K",
-            Rank.Queen => "Q",
-            Rank.Jack => "J",
-            _ => ((int)card.Rank).ToString()
-        };
+            string rankSymbol;
 
-        string suitSymbol = card.Suit switch
-        {
-            Suit.Hearts => "♥",
-            Suit.Diamonds => "♦",
-            Suit.Clubs => "♣",
-            Suit.Spades => "♠",
-            _ => "?"
-        };
+            switch (card.Rank)
+            {
+                case Rank.Ace:
+                    rankSymbol = "A";
+                    break;
+                case Rank.King:
+                    rankSymbol = "♚";
+                    break;
+                case Rank.Queen:
+                    rankSymbol = "♛";
+                    break;
+                case Rank.Jack:
+                    rankSymbol = "♞";
+                    break;
+                default:
+                    rankSymbol = ((int)card.Rank).ToString();
+                    break;
+            }
 
-        return new[]
+            string suitSymbol;
+
+            switch (card.Suit)
+            {
+                case Suit.Hearts:
+                    suitSymbol = "♥";
+                    break;
+                case Suit.Diamonds:
+                    suitSymbol = "♦";
+                    break;
+                case Suit.Clubs:
+                    suitSymbol = "♣";
+                    break;
+                case Suit.Spades:
+                    suitSymbol = "♠";
+                    break;
+                default:
+                    suitSymbol = "?";
+                    break;
+            }
+
+            return new[]
+            {
+                "┌───────┐",
+                $"│{rankSymbol.PadRight(7)}│",
+                "│       │",
+                $"│   {suitSymbol}   │",
+                "│       │",
+                $"│{rankSymbol.PadLeft(7)}│",
+                "└───────┘"
+            };
+        }
+
+        public string[] RenderBack()
         {
-            "┌───────┐",
-            $"│{rankSymbol.PadRight(7)}│",
-            "│       │",
-            $"│   {suitSymbol}   │",
-            "│       │",
-            $"│{rankSymbol.PadLeft(7)}│",
-            "└───────┘"
-        };
+            return new[]
+            {
+                "┌───────┐",
+                "│▒▒▒▒▒▒▒│",
+                "│▒▒▒▒▒▒▒│",
+                "│▒▒▒▒▒▒▒│",
+                "│▒▒▒▒▒▒▒│",
+                "│▒▒▒▒▒▒▒│",
+                "└───────┘"
+            };
+        }
     }
-}
 }

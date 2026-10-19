@@ -1,71 +1,37 @@
 # Tjugoett
 
-Ett konsolbaserat kortspel i C# där en till fem spelare ska spela tjugoett mot en givare. Programmet utvecklas gemensamt som en del av en kurs i programmering och objektorienterad utveckling.
+Ett konsolbaserat kortspel i C# där en till fem spelare spelar tjugoett mot en givare. Projektet utvecklas gemensamt som en del av en kurs i programmering och objektorienterad utveckling.
 
 ## Struktur
 
-- `Card`, `Suit` och `Rank` beskriver korten.
-- `Deck` bygger kortleken, blandar den med Fisher–Yates, delar ut kort med `DealCard()` och har `PrepareForNextRound()` för att skapa och blanda en ny lek när färre än 15 kort återstår.
-- `Hand` håller en deltagares kort och ansvarar för att räkna handens värde och handstatus.
-- `Participant` innehåller gemensamma egenskaper för `Player` och `Dealer`.
-- `Round` och `Game` är avsedda att hantera spelrundan respektive spelets flöde.
-- `ConsoleUi` hanterar konsolmeny och användarinmatning.
-- `CardRenderer` bygger en spelkortsmall som rader av text för konsolen.
+- `Card`, `Suit` och `Rank` beskriver spelkort.
+- `Deck` skapar, blandar och delar ut kort. `PrepareForNextRound()` förbereder en ny blandad lek när färre än 15 kort återstår.
+- `Hand` håller korten och beräknar handvärde, mjuk hand, bust och blackjack.
+- `Participant` innehåller gemensamma egenskaper och beteenden för spelare och givare.
+- `Player` innehåller spelarstatistik och `RecordOutcome(Outcome)` för att registrera ett utfall.
+- `Round` hanterar kort till deltagare, givarens tur och jämförelsen av spelarens och givarens händer.
+- `ConsoleUi` hanterar meny, inmatning, kortvisning och det aktuella spelflödet.
+- `GameStorage` kan läsa och skriva spelarprofiler i textfilen `players.txt`.
+- `IPlayerStrategy` och `SimplePlayerStrategy` definierar en enkel strategi, men strategin används ännu inte i det aktuella konsolflödet.
 
-## Status
+## Aktuell status
 
-Spelarna kan registreras med namn; antalet begränsas till 1–5. `Player` ärver från `Participant` och håller statistik för vinster, förluster och blackjacks. `RecordOutcome(Outcome)` uppdaterar statistiken: en vanlig vinst ökar `Wins`, en förlust ökar `Losses`, en blackjack ökar både `Wins` och `Blackjacks`, och oavgjort ändrar inga av räknarna.
+Konsolflödet kan ta emot 1–5 nya spelare, dela ut kort, låta spelaren dra eller stanna, låta givaren dra automatiskt tills handen når minst 17 och visa resultatet. Kort och handvärden visas i konsolen. `CardRenderer` finns som separat kort-renderare med en fast exempelmall för ess i hjärter. Den tar emot ett `Card`-objekt men använder det inte ännu; `ConsoleUi` använder sin egen `PrintCard`-metod.
 
-`Hand` räknar handens värde och hanterar ess som 1 eller 11. Den innehåller även statuskontroller för mjuk hand, bust och blackjack samt `Clear()` för att tömma handen.
+`Player` håller antal vinster, förluster och blackjacks. Blackjack räknas i `RecordOutcome` både som vinst och som blackjack. Resultatvisningen i `ConsoleUi` använder dock för närvarande `DetermineWinner`-text; den anropar inte `RecordOutcome`, så statistiken uppdateras ännu inte av spelet.
 
-`Round` har grundläggande stöd för att ge en deltagare kort och kontrollera om handen gått över 21. Spelets fullständiga rundflöde är ännu inte färdigkopplat till `ConsoleUi`.
-
-`GameStorage` kan spara spelarprofiler i `players.txt`, en spelare per rad med fälten namn, vinster, förluster och blackjacks separerade med semikolon. `LoadPlayers` läser raderna, delar upp fälten och skapar spelare med deras sparade statistik. Rader med fel antal fält, tomt namn eller ogiltig/negativ statistik avvisas med `InvalidDataException`.
-
-`ConsoleUi` läser nu in sparade profiler när menyloopen startar. Val av sparad spelare och sparning när spelet avslutas är ännu inte inkopplade.
+`GameStorage` kan serialisera spelarprofiler som semikolonseparerade rader med namn, vinster, förluster och blackjacks. `LoadPlayers` återställer profilerna och avvisar rader med ogiltiga fält eller värden. `ConsoleUi` läser in profiler vid start, men erbjuder ännu inte val av sparade spelare och anropar inte `SavePlayers`. Sparad statistik bevaras därför inte genom det vanliga spelflödet ännu.
 
 ## Nästa steg
 
-- Erbjud val mellan sparad och ny spelare i `AddPlayers`.
-- Spara spelarlistan när nya profiler lagts till och när statistik uppdaterats.
-- Bestäm hur semikolon i spelarnamn ska hanteras, eftersom semikolon används som fältavgränsare.
-- Bygg och prova sparning och inläsning med både giltiga och felaktiga data.
-- Färdigställa `Round` med utdelning, spelarturer, givartur och utfallsberäkning.
-- Koppla rundflödet till `Game` och `ConsoleUi`, inklusive visning av handvärden.
-- Anropa `Deck.PrepareForNextRound()` mellan rundor.
-- Koppla `CardRenderer` till konsolens kortvisning och prova utseendet.
+- Bestäm om `CardRenderer` ska byggas vidare för att visa valör och färg från det mottagna kortet och kopplas till `ConsoleUi`.
 
-Projektet byggdes efter ändringen av spelarstatistiken med 0 fel. Bygget rapporterade en varning om att `Dealer.HoleCardRevealed` inte används.
+- Låta användaren välja mellan sparade spelare och nya spelare.
+- Registrera rundans utfall med `Player.RecordOutcome` och spara profilerna när statistik ändras och när spelet avslutas.
+- Hantera semikolon i spelarnamn, eftersom tecknet används som fältavgränsare i `players.txt`.
+- Koppla `IPlayerStrategy`/`SimplePlayerStrategy` till spelarförloppet om strategispelare ska ingå.
+- Anropa `Deck.PrepareForNextRound()` när en ny runda startas.
+- Samordna ansvaret mellan `Game` och det spelflöde som för närvarande ligger i `ConsoleUi`.
+- Bygga och prova lagring, spelarstatistik och spelrundans gränsfall.
 
-Arbetet sker på feature-brancher och integreras till `dev` via pull requests och kodgranskning.
-
-## 🏗️ Arkitektur & Designmönster
-
-Projektet är uppdelat för att uppnå **separation of concerns** (separerat ansvar), vilket gör koden lättare att testa, underhålla och bygga ut:
-
-*   **`Program.cs` (Entry Point):** En ren startpunkt som enbart ansvarar för att starta spelet och fånga upp eventuella oväntade krascher (global felhantering).
-*   **`ConsoleUi.cs` (View / UI):** Hanterar all interaktion med användaren i konsolen (menyer, inmatning av spelarnamn, utskrift av kort och poäng). Känner inte till spelets interna regler i detalj.
-*   **`Game.cs` (Spelmotor / Business Logic):** Håller i själva spelloopen, hanterar kortleken, delar ut kort och styr spelets regler (t.ex. räkna poäng och avgöra vinnare).
-*   **Modeller (`Participant`, `Player`, `Dealer`, `Deck`, `Card`, `Hand`):** Domänmodeller som kapslar in datan och grundläggande beteenden för spelets entiteter.
-
----
-
-## 📂 Projektstruktur & Ansvarsområden
-
-| Fil / Klass | Ansvar |
-| :--- | :--- |
-| `Program.cs` | Startpunkt och felhantering (`try-catch`). |
-| `ConsoleUi.cs` | Konsol-IO, menyer, spelarinput och utskrifter. |
-| `Game.cs` | Spelmotor, rundhantering och flöde. |
-| `Deck.cs` | Skapa, blanda och dela ut kort från kortleken. |
-| `Card.cs` | Representerar enskilda kort (valör och färg). |
-| `Participant.cs` | Basklass för spelare och dealer (håller reda på hand och kortmottagning). |
-| `Player.cs` | Specifik logik för spelare. |
-| `Dealer.cs` | Specifik logik för dealern. |
-
-## 🎮 Funktioner (Implementerade User Stories)
-* [x] **Huvudmeny:** Starta spelet eller avsluta.
-* [x] **Spelare:** Stöd för att lägga till 1–5 spelare med egna namn.
-* [x] **Kortlek & Utskrift:** Generera en fullständig kortlek med 52 kort, blanda slumpmässigt och dela ut starthand.
-* [x] **Spelardrag:** Spelaren kan välja att dra kort ("Hit") eller stanna ("Stand").
-* [x] **Felhantering:** Programmet kraschar inte vid felaktig inmatning (`try-catch` och validering).
+Projektet integrerar gemensamt arbete via feature-brancher och pull requests till `dev`.

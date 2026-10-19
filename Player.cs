@@ -9,6 +9,7 @@ namespace Kunskapskontroll3
         public int Losses {get; private set;}
         public int Pushes {get; private set;}
         public int Blackjacks {get; private set;}
+        public IPlayerStrategy? Strategy { get; set; }
 
         public Player(string name) : base(name)
         {
