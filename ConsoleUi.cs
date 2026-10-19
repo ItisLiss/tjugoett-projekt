@@ -173,11 +173,7 @@ namespace Kunskapskontroll3
             round.PlayDealerTurn(dealer, deck);
 
             Console.WriteLine($"\nDealerns sluthand (Poäng: {dealer.Hand.Value}):");
-            foreach (Card card in dealer.Hand.Cards)
-            {
-                PrintCard(card);
-                //Console.WriteLine($"  - {card.Rank} of {card.Suit}");
-            }
+            PrintCardsSideBySide(dealer.Hand.Cards);
 
             // 4. FASE 3: JÄMFÖR OCH VISA ALLA RESULTAT
             Console.WriteLine("\n==============================");
