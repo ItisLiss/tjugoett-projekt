@@ -12,13 +12,13 @@ namespace Kunskapskontroll3
                     rankSymbol = "A";
                     break;
                 case Rank.King:
-                    rankSymbol = "K";
+                    rankSymbol = "♚";
                     break;
                 case Rank.Queen:
-                    rankSymbol = "Q";
+                    rankSymbol = "♛";
                     break;
                 case Rank.Jack:
-                    rankSymbol = "J";
+                    rankSymbol = "♞";
                     break;
                 default:
                     rankSymbol = ((int)card.Rank).ToString();
