@@ -79,10 +79,19 @@ namespace Kunskapskontroll3
             {
                 Console.Clear();
                 Console.WriteLine($"\n--- {player.Name}s tur ---");
-                Console.WriteLine($"Dealerns synliga kort: ");
-                PrintCard(dealer.Hand.Cards[0]);
-                //{dealer.Hand.Cards[0].Rank} of {dealer.Hand.Cards[0].Suit}]");
-                Console.WriteLine("(Det andra kortet är dolt)");
+                Console.WriteLine("Dealerns kort (det andra är dolt):");
+                CardRenderer dealerCardRenderer = new();
+                PrintCardRowsSideBySide(
+                    new List<string[]>
+                    {
+                        dealerCardRenderer.Render(dealer.Hand.Cards[0]),
+                        dealerCardRenderer.RenderBack()
+                    },
+                    new List<Suit?>
+                    {
+                        dealer.Hand.Cards[0].Suit,
+                        null
+                    });
 
                 // Dela ut två startkort
                 Card card1 = deck.DealCard();
@@ -240,16 +249,18 @@ namespace Kunskapskontroll3
         {
             CardRenderer renderer = new();
             List<string[]> renderedCards = new();
+            List<Suit?> suits = new();
 
             foreach (Card card in cards)
             {
                 renderedCards.Add(renderer.Render(card));
+                suits.Add(card.Suit);
             }
 
-            PrintCardRowsSideBySide(renderedCards);
+            PrintCardRowsSideBySide(renderedCards, suits);
         }
 
-        private void PrintCardRowsSideBySide(List<string[]> renderedCards)
+        private void PrintCardRowsSideBySide(List<string[]> renderedCards, List<Suit?> suits)
         {
             if (renderedCards.Count == 0)
             {
@@ -258,9 +269,26 @@ namespace Kunskapskontroll3
 
             for (int row = 0; row < renderedCards[0].Length; row++)
             {
-                foreach (string[] cardRows in renderedCards)
+                for (int cardIndex = 0; cardIndex < renderedCards.Count; cardIndex++)
                 {
-                    Console.Write(cardRows[row] + " ");
+                    string cardRow = renderedCards[cardIndex][row];
+
+                    if (row == 3 &&
+                        (suits[cardIndex] == Suit.Hearts ||
+                         suits[cardIndex] == Suit.Diamonds))
+                    {
+                        Console.Write(cardRow[..4]);
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.Write(cardRow[4]);
+                        Console.ResetColor();
+                        Console.Write(cardRow[5..]);
+                    }
+                    else
+                    {
+                        Console.Write(cardRow);
+                    }
+
+                    Console.Write(" ");
                 }
 
                 Console.WriteLine();
