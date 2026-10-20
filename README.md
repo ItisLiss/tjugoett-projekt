@@ -22,11 +22,27 @@ Konsolflödet kan ta emot 1–5 nya spelare, dela ut kort, låta spelaren dra el
 
 `GameStorage` kan serialisera spelarprofiler som semikolonseparerade rader med namn, vinster, förluster och blackjacks. `LoadPlayers` återställer profilerna och avvisar rader med ogiltiga fält eller värden. `ConsoleUi` läser in profiler vid start, men erbjuder ännu inte val av sparade spelare och anropar inte `SavePlayers`. Sparad statistik bevaras därför inte genom det vanliga spelflödet ännu.
 
+### Välja sparad eller ny spelare (Gry)
+
+Gry arbetar på att låta varje spelare välja mellan en sparad profil och en ny. `AddPlayers` anropar nu `ChooseOrCreatePlayer(int playerNumber)` för varje mänsklig spelare och lägger till den `Player` som metoden returnerar. Metoden är inte `static`, eftersom den behöver läsa instansfältet `_savedPlayers`.
+
+Klart:
+
+1. Om det inte finns några sparade spelare skapas en ny spelare direkt, utan meny.
+2. Annars visas en meny i en `while (true)`-loop: *1. Välj befintlig spelare* eller *2. Skapa ny spelare*. Ogiltiga val ger ett felmeddelande och menyn visas igen. Val 2 läser in ett namn och returnerar en ny `Player`.
+3. Val 1 anropar `SelectExistingPlayer()`. Den skriver ut de sparade spelarna numrerade med vinster, förluster, blackjack och marker, läser in ett nummer tills det är giltigt och returnerar samma `Player`-objekt som finns i `_savedPlayers`, så att statistiken uppdateras på den sparade profilen.
+
+Kvar att göra:
+
+4. Ett nytt namn får inte vara samma som en befintlig spelares, så att ingen profil skrivs över.
+5. Samma person ska inte kunna väljas två gånger i samma spel.
+6. Nya spelare läggs ännu inte till i `_savedPlayers`, och `SavePlayers` anropas inte, så de sparas inte mellan körningar.
+
 ## Nästa steg
 
 - Bestäm om `CardRenderer` ska byggas vidare för att visa valör och färg från det mottagna kortet och kopplas till `ConsoleUi`.
 
-- Låta användaren välja mellan sparade spelare och nya spelare.
+- Låta användaren välja mellan sparade spelare och nya spelare (påbörjat av Gry, se ovan).
 - Registrera rundans utfall med `Player.RecordOutcome` och spara profilerna när statistik ändras och när spelet avslutas.
 - Hantera semikolon i spelarnamn, eftersom tecknet används som fältavgränsare i `players.txt`.
 - Koppla `IPlayerStrategy`/`SimplePlayerStrategy` till spelarförloppet om strategispelare ska ingå.
