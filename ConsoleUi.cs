@@ -60,14 +60,39 @@ namespace Kunskapskontroll3
             bool spelaFleraRundor = true;
             while (spelaFleraRundor)
             {
-                deck.PrepareForNextRound();
+                // 0. TA BORT SPELARE SOM ÄR PANKA (0 MARKER)
+                players.RemoveAll(p => p.Chips <= 0);
 
-            
+                if (players.Count == 0)
+                {
+                    Console.Clear();
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Alla spelare har slut på marker! Spelet är slut.");
+                    Console.ResetColor();
+                    break;
+                }
+
+                deck.PrepareForNextRound();
                 foreach (Player player in players)
                 {
                     player.NewHand();
                 }
-                Round round = new Round();
+
+             // --- FASE 0: INSATSER ---
+                Console.Clear();
+                Console.WriteLine("==============================");
+                Console.WriteLine("       INSATSFASEN            ");
+                Console.WriteLine("==============================");
+
+                foreach (Player player in players)
+                {
+                    PlaceBetForPlayer(player);
+                }
+
+                Console.WriteLine("\nAlla insatser placerade! Tryck på valfri tangent för att dela ut korten...");
+                Console.ReadKey();
+
+             Round round = new Round();
 
             // 1. Skapa dealern och dela ut startkort (ett synligt, ett dolt)
             Dealer dealer = new Dealer();
@@ -79,10 +104,19 @@ namespace Kunskapskontroll3
             {
                 Console.Clear();
                 Console.WriteLine($"\n--- {player.Name}s tur ---");
-                Console.WriteLine($"Dealerns synliga kort: ");
-                PrintCard(dealer.Hand.Cards[0]);
-                //{dealer.Hand.Cards[0].Rank} of {dealer.Hand.Cards[0].Suit}]");
-                Console.WriteLine("(Det andra kortet är dolt)");
+                Console.WriteLine("Dealerns kort (det andra är dolt):");
+                CardRenderer dealerCardRenderer = new();
+                PrintCardRowsSideBySide(
+                    new List<string[]>
+                    {
+                        dealerCardRenderer.Render(dealer.Hand.Cards[0]),
+                        dealerCardRenderer.RenderBack()
+                    },
+                    new List<Suit?>
+                    {
+                        dealer.Hand.Cards[0].Suit,
+                        null
+                    });
 
                     // Dela ut två startkort
                     deck.PrepareForNextRound();
@@ -165,38 +199,67 @@ namespace Kunskapskontroll3
             round.PlayDealerTurn(dealer, deck);
 
             Console.WriteLine($"\nDealerns sluthand (Poäng: {dealer.Hand.Value}):");
-            foreach (Card card in dealer.Hand.Cards)
-            {
-                PrintCard(card);
-                //Console.WriteLine($"  - {card.Rank} of {card.Suit}");
-            }
+            PrintCardsSideBySide(dealer.Hand.Cards);
 
             // 4. FASE 3: JÄMFÖR OCH VISA ALLA RESULTAT
             Console.WriteLine("\n==============================");
             Console.WriteLine("       SLUTRESULTAT           ");
             Console.WriteLine("==============================");
 
-                foreach (Player player in players)
+            foreach (Player player in players)
+            {
+                // 1. Spara insatsen i en variabel INNAN någon metod nollställer den
+                int betAtStake = player.CurrentBet;
+
+                // 2. Bestäm resultat och beräkna utbetalning (RecordOutcome anropar WinBet/LoseBet internt)
+                string result = round.DetermineWinner(player, dealer);
+
+                // Om DetermineWinner INTE anropar RecordOutcome själv, gör vi det här baserat på resultatet:
+                if (result.Contains("Vunnit") || result.Contains("vunnit"))
                 {
-                    string result = round.DetermineWinner(player, dealer);
-                    Console.Write($"\nSpelare: {player.Name} ({player.Hand.Value} poäng) -> ");
-                    
-                    if (result.Contains("Vunnit"))
-                    {
-                        Console.ForegroundColor = ConsoleColor.Green;
-                    }
-                    else if (result.Contains("Förlorat"))
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                    }
-                    else
-                    {
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                    }
-                    
+                    player.RecordOutcome(Outcome.Win);
+                }
+                else if (result.Contains("Förlorat") || result.Contains("förlorat") || result.Contains("sprack"))
+                {
+                    player.RecordOutcome(Outcome.Lose);
+                }
+                else if (result.Contains("Lika") || result.Contains("Push"))
+                {
+                    player.RecordOutcome(Outcome.Push);
+                }
+                else if (result.Contains("Blackjack"))
+                {
+                    player.RecordOutcome(Outcome.Blackjack);
+                }
+
+                // 3. Snygg och enhetlig utskrift (utan dubletter)
+                Console.Write($"\nSpelare: {player.Name} ({player.Hand.Value} poäng) -> ");
+
+                if (result.Contains("Vunnit") || result.Contains("vunnit") || result.Contains("Blackjack"))
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine(result);
                     Console.ResetColor();
+                    Console.WriteLine($"  + Plus {betAtStake} marker i vinst!");
                 }
+                else if (result.Contains("Förlorat") || result.Contains("förlorat") || result.Contains("sprack"))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine(result);
+                    Console.ResetColor();
+                    Console.WriteLine($"  - Förlorade insatsen på {betAtStake} marker.");
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine(result);
+                    Console.ResetColor();
+                    Console.WriteLine($"  Insatsen på {betAtStake} marker återlämnad.");
+                }
+
+                Console.WriteLine($"  Totalt saldo: {player.Chips} marker");
+            }
+         
                 Console.WriteLine("\n--------------------------------------------");
                 Console.WriteLine("Vill ni spela en till runda? (J/N)");
                 string? svar = Console.ReadLine();
@@ -212,7 +275,8 @@ namespace Kunskapskontroll3
             }
         Console.WriteLine("\nTryck på valfri tangent för att gå tillbaka till menyn.");
         Console.ReadKey();
-    }
+        }
+
 
         // --- NY HJÄLPMETOD FÖR ATT VISA HANDEN SNYGGT ---
         private void DisplayPlayerHand(Player player)
@@ -241,16 +305,18 @@ namespace Kunskapskontroll3
         {
             CardRenderer renderer = new();
             List<string[]> renderedCards = new();
+            List<Suit?> suits = new();
 
             foreach (Card card in cards)
             {
                 renderedCards.Add(renderer.Render(card));
+                suits.Add(card.Suit);
             }
 
-            PrintCardRowsSideBySide(renderedCards);
+            PrintCardRowsSideBySide(renderedCards, suits);
         }
 
-        private void PrintCardRowsSideBySide(List<string[]> renderedCards)
+        private void PrintCardRowsSideBySide(List<string[]> renderedCards, List<Suit?> suits)
         {
             if (renderedCards.Count == 0)
             {
@@ -259,9 +325,26 @@ namespace Kunskapskontroll3
 
             for (int row = 0; row < renderedCards[0].Length; row++)
             {
-                foreach (string[] cardRows in renderedCards)
+                for (int cardIndex = 0; cardIndex < renderedCards.Count; cardIndex++)
                 {
-                    Console.Write(cardRows[row] + " ");
+                    string cardRow = renderedCards[cardIndex][row];
+
+                    if (row == 3 &&
+                        (suits[cardIndex] == Suit.Hearts ||
+                         suits[cardIndex] == Suit.Diamonds))
+                    {
+                        Console.Write(cardRow[..4]);
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.Write(cardRow[4]);
+                        Console.ResetColor();
+                        Console.Write(cardRow[5..]);
+                    }
+                    else
+                    {
+                        Console.Write(cardRow);
+                    }
+
+                    Console.Write(" ");
                 }
 
                 Console.WriteLine();
@@ -400,6 +483,43 @@ namespace Kunskapskontroll3
 
             Console.WriteLine($"  [{card.Rank} {suitSymbol}]");
             Console.ResetColor();
+        }
+
+        private static void PlaceBetForPlayer(Player player)
+        {
+            // Säkriv att gamla insatser är nollställda inför en ny runda
+            player.CurrentBet = 0;
+            // Om spelaren är en datorspelare
+            if (player.Strategy != null)
+            {
+                // Datorspelare satsar t.ex. 10% av sina marker, dock minst 10 eller allt de har kvar
+                int botBet = Math.Max(10, player.Chips / 10);
+                botBet = Math.Min(botBet, player.Chips);
+                player.PlaceBet(botBet);
+                Console.WriteLine($"{player.Name} satsar {player.CurrentBet} marker (saldo: {player.Chips} marker).");
+                return;
+            }
+
+            // Mänsklig spelare
+            while (true)
+            {
+                Console.WriteLine($"\n{player.Name}, du har {player.Chips} marker.");
+                Console.Write("Hur mycket vill du satsa? ");
+                string? input = Console.ReadLine();
+
+                if (int.TryParse(input, out int amount))
+                {
+                    if (player.PlaceBet(amount))
+                    {
+                        Console.WriteLine($"Insats godkänd! Du satsade {amount} marker (kvar: {player.Chips} marker).");
+                        break;
+                    }
+                }
+
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Ogiltig insats! Du måste satsa mer än 0 och max vad du har ({player.Chips} marker).");
+                Console.ResetColor();
+            }
         }
 
     }
