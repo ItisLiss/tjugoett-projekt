@@ -85,8 +85,8 @@ namespace Kunskapskontroll3
 
             for (int i = 0; i < playerCount; i++)
             {
-                string name = ReadPlayerName(i + 1);
-                players.Add(new Player(name));
+                Player player = ChooseOrCreatePlayer(i + 1);
+                players.Add(player);
             }
 
             Console.Write("Hur många datorspelare vill du lägga till? (0 för inga): ");
@@ -125,6 +125,61 @@ namespace Kunskapskontroll3
             }
             return players;
         }
+        private Player ChooseOrCreatePlayer(int playerNumber)
+        {
+            // 1. Om _savedPlayers är tom: skapa ny spelare direkt (ingen meny behövs)
+            if (_savedPlayers.Count == 0)
+            {
+                return new Player(ReadPlayerName(playerNumber));
+            }
+
+            while (true)
+            {
+                Console.WriteLine($"\n--- Spelare {playerNumber} ---");
+                Console.WriteLine("1. Välj befintlig spelare");
+                Console.WriteLine("2. Skapa ny spelare");
+                Console.Write("Välj (1-2): ");
+                string? choice = Console.ReadLine();
+
+                if (choice == "1")
+                {
+                    return SelectExistingPlayer();
+                }
+                else if (choice == "2")
+                {
+                    return new Player(ReadPlayerName(playerNumber));
+                }
+                else
+                {
+                    Console.WriteLine("Ogiltigt val, ange 1 eller 2.");
+                }
+            
+            }
+        }
+        private Player SelectExistingPlayer()
+        {
+            // Skriv ut alla sparade spelare med nummer
+            Console.WriteLine("\nSparade spelare:");
+            for (int i = 0; i < _savedPlayers.Count; i++)
+            {
+                Player saved = _savedPlayers[i];
+                Console.WriteLine($"{i + 1}. {saved.Name} - Vinster: {saved.Wins}, Förluster: {saved.Losses}, Blackjack: {saved.Blackjacks}, Marker: {saved.Chips}");
+            }
+
+            // Läs in ett nummer tills det är giltigt
+            while (true)
+            {
+                Console.Write($"Välj spelare (1-{_savedPlayers.Count}): ");
+                string? input = Console.ReadLine();
+
+                if (int.TryParse(input, out int number) && number >= 1 && number <= _savedPlayers.Count)
+                {
+                    return _savedPlayers[number - 1];
+                }
+
+                Console.WriteLine($"Ange ett heltal mellan 1 och {_savedPlayers.Count}.");
+            }
+        }    
 
         public void DisplayRules()
         {
