@@ -259,6 +259,9 @@ namespace Kunskapskontroll3
                 Console.WriteLine($"  Totalt saldo: {player.Chips} marker");
             }
 
+                // Spara statistik och marker för alla sparade spelare efter varje runda
+                _gameStorage.SavePlayers(_savedPlayers);
+
                 Console.WriteLine("\n--------------------------------------------");
                 Console.WriteLine("Vill ni spela en till runda? (J/N)");
                 string? svar = Console.ReadLine();
