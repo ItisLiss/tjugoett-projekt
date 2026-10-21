@@ -45,6 +45,10 @@ class Round
             {
                 return "Vunnit! (Dealern sprack)";
             }
+            if(playerVal == 21 && dealerVal != 21 || (player.Hand.Cards.Count == 2 && playerVal == 21 && dealerVal != 21))
+            {
+                return "Blackjack";
+            }
             if (playerVal > dealerVal)
             {
                 return "Vunnit!";
