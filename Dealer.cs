@@ -11,7 +11,8 @@ class Dealer : Participant
 
     public Move DecideMove()
     {
-        return Hand.Value < StandValue ? Move.Hit : Move.Stand;
+        return Hand.Value < StandValue || (Hand.Value == StandValue && Hand.IsSoft && Config.ShouldHitOnSoft)  
+        ? Move.Hit : Move.Stand;
     }
 
     public void RevealHoleCard()
@@ -23,7 +24,7 @@ class Dealer : Participant
     {
         RevealHoleCard();
 
-        if(DecideMove() == Move.Hit)
+        while(DecideMove() == Move.Hit)
         {
             ReceiveCard(deck.DealCard());
         }

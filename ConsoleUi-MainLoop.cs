@@ -26,6 +26,9 @@ namespace Kunskapskontroll3
                         DisplayRules();
                         break;
                     case "3":
+                        Settings();
+                        break;
+                    case "4":
                         running = false;
                         DisplayMessage("Tack för att du spelade!");
                         break;
@@ -44,8 +47,9 @@ namespace Kunskapskontroll3
             Console.WriteLine("==============================");
             Console.WriteLine("1. Starta nytt spel");
             Console.WriteLine("2. Visa regler");
-            Console.WriteLine("3. Avsluta");
-            Console.Write("\nVälj ett alternativ (1-3): ");
+            Console.WriteLine("3. Visa inställningar");
+            Console.WriteLine("4. Avsluta");
+            Console.Write("\nVälj ett alternativ (1-4): ");
         }
 
         public void StartNewGame()
@@ -118,9 +122,10 @@ namespace Kunskapskontroll3
                         null
                     });
 
-                // Dela ut två startkort
-                Card card1 = deck.DealCard();
-                bool busted = round.GiveCardAndCheckBust(player, card1);
+                    // Dela ut två startkort
+                    deck.PrepareForNextRound();
+                    Card card1 = deck.DealCard();
+                    bool busted = round.GiveCardAndCheckBust(player, card1);
 
                 Card card2 = deck.DealCard();
                 busted = round.GiveCardAndCheckBust(player, card2);
@@ -222,7 +227,7 @@ namespace Kunskapskontroll3
                 {
                     player.RecordOutcome(Outcome.Lose);
                 }
-                else if (result.Contains("Lika") || result.Contains("Push"))
+                else if (result.Contains("Lika") || result.Contains("Push") || result.Contains("Oavgjort"))
                 {
                     player.RecordOutcome(Outcome.Push);
                 }
@@ -279,7 +284,91 @@ namespace Kunskapskontroll3
         Console.ReadKey();
         }
 
+        public void Settings()
+        {
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("--- INSTÄLLNINGAR ---");
+                Console.WriteLine(Config.PrintConfig());
 
+                Console.WriteLine("\n1. Ändra om givaren köper på mjuk 17");
+                Console.WriteLine("2. Ändra antal kortlekar");
+                Console.WriteLine("3. Ändra när en ny kortlek tas fram");
+                Console.WriteLine("4. Ändra om naturlig tjugoett vinner över 21 med tre eller fler kort");
+                Console.WriteLine("5. Spara inställningar till fil");
+                Console.WriteLine("6. Ladda inställningar från fil");
+                Console.WriteLine("7. Tillbaka till menyn");
+                Console.Write("\nVälj ett alternativ (1-7): ");
+
+                string? choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        Config.ShouldHitOnSoft = ReadYesNo("Ska givaren köpa på mjuk 17?");
+                        break;
+                    case "2":
+                        Config.DeckCount = ReadNumber("Antal kortlekar", 1, 8);
+                        break;
+                    case "3":
+                        Config.MinDeckCardAmount = ReadNumber("Ny kortlek när färre än så här många kort är kvar", 1, 52);
+                        break;
+                    case "4":
+                        Config.NaturalBlackjackWin = ReadYesNo("Ska naturlig tjugoett vinna över 21 med tre eller fler kort?");
+                        break;
+                    case "5":
+                        Config.SaveConfig();
+                        DisplayMessage("Inställningarna har sparats.");
+                        break;
+                    case "6":
+                        Config.LoadConfig();
+                        DisplayMessage("Inställningarna har laddats från filen.");
+                        break;
+                    case "7":
+                        return;
+                    default:
+                        DisplayMessage("Ogiltigt val, försök igen.");
+                        break;
+                }
+            }
+        }
+
+        private static bool ReadYesNo(string question)
+        {
+            while (true)
+            {
+                Console.Write($"{question} \n(J/N): ");
+                string? input = Console.ReadLine()?.Trim().ToUpper();
+
+                if (input == "J")
+                {
+                    return true;
+                }
+                if (input == "N")
+                {
+                    return false;
+                }
+
+                Console.WriteLine("Svara med J eller N.");
+            }
+        }
+
+        private static int ReadNumber(string question, int min, int max)
+        {
+            while (true)
+            {
+                Console.Write($"{question} \n({min}-{max}): ");
+                string? input = Console.ReadLine();
+
+                if (int.TryParse(input, out int number) && number >= min && number <= max)
+                {
+                    return number;
+                }
+
+                Console.WriteLine($"Ange ett heltal mellan {min} och {max}.");
+            }
+        }
     }
 
 }
