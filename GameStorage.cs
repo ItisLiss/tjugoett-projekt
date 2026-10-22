@@ -36,12 +36,12 @@ namespace Kunskapskontroll3
 
                 if (parts.Length != 5)
                 {
-                    throw new InvalidDataException("En spelarrad måste innehålla exakt fem fält.");
+                    continue; // hoppa över rader med fel antal fält
                 }
 
                 if (string.IsNullOrWhiteSpace(parts[0]))
                 {
-                    throw new InvalidDataException("En spelarrad saknar spelarnamn.");
+                    continue; // hoppa över rader utan namn
                 }
 
                 if (!int.TryParse(parts[1], out int wins) ||
@@ -50,7 +50,7 @@ namespace Kunskapskontroll3
                     !int.TryParse(parts[4], out int chips) ||
                     wins < 0 || losses < 0 || blackjacks < 0 || chips < 0)
                 {
-                    throw new InvalidDataException("En spelarrad innehåller ogiltig statistik.");
+                    continue; // hoppa över rader med ogiltig statistik
                 }
 
                 players.Add(new Player(parts[0].Trim(), wins, losses, blackjacks, chips));
