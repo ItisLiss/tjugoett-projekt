@@ -76,9 +76,9 @@ namespace Kunskapskontroll3
                     break;
                 }
 
-                deck.PrepareForNextRound();
                 foreach (Player player in players)
                 {
+                    deck.PrepareForNextRound();
                     player.NewHand();
                 }
 
@@ -310,7 +310,7 @@ namespace Kunskapskontroll3
                         Config.DeckCount = ReadNumber("Antal kortlekar", 1, 8);
                         break;
                     case "3":
-                        Config.MinDeckCardAmount = ReadNumber("Ny kortlek när färre än så här många kort är kvar", 1, 52);
+                        Config.MinDeckCardAmount = ReadNumber("Ny kortlek när färre än så här många kort är kvar", 10, 52);
                         break;
                     case "4":
                         Config.NaturalBlackjackWin = ReadYesNo("Ska naturlig tjugoett vinna över 21 med tre eller fler kort?");

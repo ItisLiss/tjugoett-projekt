@@ -45,7 +45,7 @@ class Round
             {
                 return "Vunnit! (Dealern sprack)";
             }
-            if(player.Hand.IsBlackJack && dealerVal != 21 || (Config.NaturalBlackjackWin && player.Hand.IsBlackJack))
+            if(player.Hand.IsBlackJack && dealerVal != 21 || (Config.NaturalBlackjackWin && player.Hand.IsBlackJack && !dealer.Hand.IsBlackJack))
             {
                 return "Blackjack";
             }
