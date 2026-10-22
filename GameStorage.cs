@@ -12,7 +12,7 @@ namespace Kunskapskontroll3
 
             foreach (Player player in players)
             {
-                string line = $"{player.Name};{player.Wins};{player.Losses};{player.Blackjacks};{player.Chips}";
+                string line = $"{player.Name};{player.Wins};{player.Losses};{player.Pushes};{player.Blackjacks};{player.Chips}";
                 lines.Add(line);
             }
 
@@ -34,7 +34,7 @@ namespace Kunskapskontroll3
                 if(line.Trim() == "") continue;
                 string[] parts = line.Split(';');
 
-                if (parts.Length != 5)
+                if (parts.Length != 6)
                 {
                     continue; // hoppa över rader med fel antal fält
                 }
@@ -46,14 +46,15 @@ namespace Kunskapskontroll3
 
                 if (!int.TryParse(parts[1], out int wins) ||
                     !int.TryParse(parts[2], out int losses) ||
+                    !int.TryParse(parts[3], out int pushes) ||
                     !int.TryParse(parts[3], out int blackjacks) ||
                     !int.TryParse(parts[4], out int chips) ||
-                    wins < 0 || losses < 0 || blackjacks < 0 || chips < 0)
+                    wins < 0 || losses < 0 || pushes < 0 || blackjacks < 0 || chips < 0)
                 {
                     continue; // hoppa över rader med ogiltig statistik
                 }
 
-                players.Add(new Player(parts[0].Trim(), wins, losses, blackjacks, chips));
+                players.Add(new Player(parts[0].Trim(), wins, losses, pushes, blackjacks, chips));
             }
 
             return players;

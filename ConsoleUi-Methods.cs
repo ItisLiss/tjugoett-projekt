@@ -131,7 +131,7 @@ namespace Kunskapskontroll3
             List<Player> available = new();
             foreach (Player saved in _savedPlayers)
             {
-                if (!playersInGame.Contains(saved))
+                if (!playersInGame.Contains(saved) && saved.Chips > 0)
                 {
                     available.Add(saved);
                 }

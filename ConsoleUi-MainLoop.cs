@@ -137,6 +137,12 @@ namespace Kunskapskontroll3
                     DisplayMessage("Du har spruckit på starthanden!");
                     continue;
                 }
+                // NY KONTROLL: Om spelaren har Blackjack på starthanden stannar turen omedelbart!
+                if (player.Hand.IsBlackJack)
+                {
+                    Console.WriteLine($"{player.Name} har Blackjack och stannar automatiskt!");
+                    continue; // Hoppar över köp-loopen och går till nästa spelare
+                }
 
                 // Loop för spelardrag (Hit eller Stand)
                 while (!busted)
@@ -238,8 +244,16 @@ namespace Kunskapskontroll3
 
                 // 3. Snygg och enhetlig utskrift (utan dubletter)
                 Console.Write($"\nSpelare: {player.Name} ({player.Hand.Value} poäng) -> ");
-
-                if (result.Contains("Vunnit") || result.Contains("vunnit") || result.Contains("Blackjack"))
+                if (result.Contains("Blackjack"))
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine(result);
+                    Console.ResetColor();
+                    // Beräkna gärna 3:2-vinsten om den visas, eller skriv ut texten:
+                    Console.WriteLine($"  + Blackjack! Vinner 3:2 ({Math.Round(betAtStake * 1.5)} marker i vinst)!");
+                }
+               
+                else if (result.Contains("Vunnit") || result.Contains("vunnit"))
                 {
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine(result);
