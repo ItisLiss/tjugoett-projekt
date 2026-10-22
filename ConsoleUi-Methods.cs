@@ -85,7 +85,7 @@ namespace Kunskapskontroll3
 
             for (int i = 0; i < playerCount; i++)
             {
-                Player player = ChooseOrCreatePlayer(i + 1);
+                Player player = ChooseOrCreatePlayer(i + 1, players);
                 players.Add(player);
             }
 
@@ -125,12 +125,22 @@ namespace Kunskapskontroll3
             }
             return players;
         }
-        private Player ChooseOrCreatePlayer(int playerNumber)
+        private Player ChooseOrCreatePlayer(int playerNumber, List<Player> playersInGame)
         {
-            // 1. Om _savedPlayers är tom: skapa ny spelare direkt (ingen meny behövs)
-            if (_savedPlayers.Count == 0)
+            // Gör en lista med sparade spelare som inte redan är valda i det här spelet
+            List<Player> available = new();
+            foreach (Player saved in _savedPlayers)
             {
-                return new Player(ReadPlayerName(playerNumber));
+                if (!playersInGame.Contains(saved))
+                {
+                    available.Add(saved);
+                }
+            }
+
+            // 1. Om ingen sparad spelare går att välja: skapa ny spelare direkt (ingen meny behövs)
+            if (available.Count == 0)
+            {
+                return CreateNewPlayer(playerNumber);
             }
 
             while (true)
@@ -143,11 +153,11 @@ namespace Kunskapskontroll3
 
                 if (choice == "1")
                 {
-                    return SelectExistingPlayer();
+                    return SelectExistingPlayer(available);
                 }
                 else if (choice == "2")
                 {
-                    return new Player(ReadPlayerName(playerNumber));
+                    return CreateNewPlayer(playerNumber);
                 }
                 else
                 {
@@ -156,30 +166,41 @@ namespace Kunskapskontroll3
             
             }
         }
-        private Player SelectExistingPlayer()
+        private Player SelectExistingPlayer(List<Player> available)
         {
-            // Skriv ut alla sparade spelare med nummer
+            // Skriv ut de sparade spelare som går att välja, med nummer
             Console.WriteLine("\nSparade spelare:");
-            for (int i = 0; i < _savedPlayers.Count; i++)
+            for (int i = 0; i < available.Count; i++)
             {
-                Player saved = _savedPlayers[i];
+                Player saved = available[i];
                 Console.WriteLine($"{i + 1}. {saved.Name} - Vinster: {saved.Wins}, Förluster: {saved.Losses}, Blackjack: {saved.Blackjacks}, Marker: {saved.Chips}");
             }
 
             // Läs in ett nummer tills det är giltigt
             while (true)
             {
-                Console.Write($"Välj spelare (1-{_savedPlayers.Count}): ");
+                Console.Write($"Välj spelare (1-{available.Count}): ");
                 string? input = Console.ReadLine();
 
-                if (int.TryParse(input, out int number) && number >= 1 && number <= _savedPlayers.Count)
+                if (int.TryParse(input, out int number) && number >= 1 && number <= available.Count)
                 {
-                    return _savedPlayers[number - 1];
+                    return available[number - 1];
                 }
 
-                Console.WriteLine($"Ange ett heltal mellan 1 och {_savedPlayers.Count}.");
+                Console.WriteLine($"Ange ett heltal mellan 1 och {available.Count}.");
             }
-        }    
+        }
+
+        private Player CreateNewPlayer(int playerNumber)
+        {
+            string name = ReadPlayerName(playerNumber);
+            Player player = new Player(name);
+
+            // Lägg till i listan så att spelaren kan sparas och väljas nästa gång
+            _savedPlayers.Add(player);
+
+            return player;
+        }
 
         public void DisplayRules()
         {
@@ -213,20 +234,43 @@ namespace Kunskapskontroll3
             }
         }
 
-        private static string ReadPlayerName(int playerNumber)
+        private string ReadPlayerName(int playerNumber)
         {
             while (true)
             {
                 Console.Write($"Ange namn för spelare {playerNumber}: ");
-                string? name = Console.ReadLine();
+                string? name = Console.ReadLine()?.Trim();
 
-                if (!string.IsNullOrWhiteSpace(name))
+                if (string.IsNullOrWhiteSpace(name))
                 {
-                    return name.Trim();
+                    Console.WriteLine("Namnet får inte vara tomt.");
                 }
-
-                Console.WriteLine("Namnet får inte vara tomt.");
+                else if (name.Contains(';'))
+                {
+                    // ; används för att skilja fälten åt i players.txt
+                    Console.WriteLine("Namnet får inte innehålla tecknet ;");
+                }
+                else if (NameExists(name))
+                {
+                    Console.WriteLine("Det namnet finns redan. Välj befintlig spelare eller ange ett annat namn.");
+                }
+                else
+                {
+                    return name;
+                }
             }
+        }
+
+        private bool NameExists(string name)
+        {
+            foreach (Player saved in _savedPlayers)
+            {
+                if (saved.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private static string OutComeText(Outcome outcome) => outcome switch
