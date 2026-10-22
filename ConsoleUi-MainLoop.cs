@@ -41,7 +41,7 @@ namespace Kunskapskontroll3
 
         public void DisplayMenu()
         {
-            Console.Clear();
+            ClearScreen();
             Console.WriteLine("==============================");
             Console.WriteLine("    VÄLKOMMEN TILL TJUGOETT!   ");
             Console.WriteLine("==============================");
@@ -54,7 +54,7 @@ namespace Kunskapskontroll3
 
         public void StartNewGame()
         {
-            Console.Clear();
+            ClearScreen();
             Console.WriteLine("--- NYTT SPEL ---");
             List<Player> players = AddPlayers();
         
@@ -69,7 +69,7 @@ namespace Kunskapskontroll3
 
                 if (players.Count == 0)
                 {
-                    Console.Clear();
+                    ClearScreen();
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Alla spelare har slut på marker! Spelet är slut.");
                     Console.ResetColor();
@@ -83,7 +83,7 @@ namespace Kunskapskontroll3
                 }
 
              // --- FASE 0: INSATSER ---
-                Console.Clear();
+                ClearScreen();
                 Console.WriteLine("==============================");
                 Console.WriteLine("       INSATSFASEN            ");
                 Console.WriteLine("==============================");
@@ -106,22 +106,6 @@ namespace Kunskapskontroll3
             // 2. FASE 1: ALLA SPELARE SPELAR KLART
             foreach (Player player in players)
             {
-                Console.Clear();
-                Console.WriteLine($"\n--- {player.Name}s tur ---");
-                Console.WriteLine("Dealerns kort (det andra är dolt):");
-                CardRenderer dealerCardRenderer = new();
-                PrintCardRowsSideBySide(
-                    new List<string[]>
-                    {
-                        dealerCardRenderer.Render(dealer.Hand.Cards[0]),
-                        dealerCardRenderer.RenderBack()
-                    },
-                    new List<Suit?>
-                    {
-                        dealer.Hand.Cards[0].Suit,
-                        null
-                    });
-
                     // Dela ut två startkort
                     deck.PrepareForNextRound();
                     Card card1 = deck.DealCard();
@@ -130,7 +114,7 @@ namespace Kunskapskontroll3
                 Card card2 = deck.DealCard();
                 busted = round.GiveCardAndCheckBust(player, card2);
 
-                DisplayPlayerHand(player);
+                DrawPlayerTurn(player, dealer);
 
                 if (busted)
                 {
@@ -171,7 +155,7 @@ namespace Kunskapskontroll3
                         Card newCard = deck.DealCard();
                         busted = round.GiveCardAndCheckBust(player, newCard);
 
-                        DisplayPlayerHand(player);
+                        DrawPlayerTurn(player, dealer);
 
                         if (busted)
                         {
@@ -195,7 +179,7 @@ namespace Kunskapskontroll3
             }
 
             // 3. FASE 2: DEALERNS TUR
-            Console.Clear();
+            ClearScreen();
             Console.WriteLine("\n==============================");
             Console.WriteLine("       DEALERNS TUR           ");
             Console.WriteLine("==============================");
@@ -276,7 +260,7 @@ namespace Kunskapskontroll3
                 }
                 else
                 {
-                    Console.Clear();
+                    ClearScreen();
                     Console.WriteLine("--- Ny runda startar nu ---");
                 }
             }
@@ -288,7 +272,7 @@ namespace Kunskapskontroll3
         {
             while (true)
             {
-                Console.Clear();
+                ClearScreen();
                 Console.WriteLine("--- INSTÄLLNINGAR ---");
                 Console.WriteLine(Config.PrintConfig());
 
