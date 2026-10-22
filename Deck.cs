@@ -54,12 +54,14 @@ namespace Kunskapskontroll3
             if (cards.Count < Config.MinDeckCardAmount)
             {
                 cards.Clear();
-
-                foreach (Suit suit in Enum.GetValues<Suit>())
+                for(int i = 0; i < Config.DeckCount; i++)
                 {
-                    foreach (Rank rank in Enum.GetValues<Rank>())
+                    foreach (Suit suit in Enum.GetValues<Suit>())
                     {
-                        cards.Add(new Card(suit, rank));
+                        foreach (Rank rank in Enum.GetValues<Rank>())
+                        {
+                            cards.Add(new Card(suit, rank));
+                        }
                     }
                 }
 

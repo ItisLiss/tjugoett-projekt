@@ -45,9 +45,13 @@ class Round
             {
                 return "Vunnit! (Dealern sprack)";
             }
-            if(playerVal == 21 && dealerVal != 21 || (player.Hand.Cards.Count == 2 && playerVal == 21 && dealerVal != 21))
+            if(player.Hand.IsBlackJack && dealerVal != 21 || (Config.NaturalBlackjackWin && player.Hand.IsBlackJack))
             {
                 return "Blackjack";
+            }
+            if(Config.NaturalBlackjackWin && dealer.Hand.IsBlackJack && playerVal == 21)
+            {
+                return "Förlorat (Dealern har naturlig tjugoett)";
             }
             if (playerVal > dealerVal)
             {
