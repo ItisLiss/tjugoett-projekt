@@ -28,6 +28,29 @@ namespace Kunskapskontroll3
             }
         }
 
+        // Ritar om hela bordet för en spelares tur: dealerns kort och spelarens hand.
+        // Anropas både när turen börjar och efter varje köpt kort, så att handen inte skrivs ut två gånger.
+        private void DrawPlayerTurn(Player player, Dealer dealer)
+        {
+            ClearScreen();
+            Console.WriteLine($"\n--- {player.Name}s tur ---");
+            Console.WriteLine("Dealerns kort (det andra är dolt):");
+            CardRenderer dealerCardRenderer = new();
+            PrintCardRowsSideBySide(
+                new List<string[]>
+                {
+                    dealerCardRenderer.Render(dealer.Hand.Cards[0]),
+                    dealerCardRenderer.RenderBack()
+                },
+                new List<Suit?>
+                {
+                    dealer.Hand.Cards[0].Suit,
+                    null
+                });
+
+            DisplayPlayerHand(player);
+        }
+
         private void PrintCardsSideBySide(IEnumerable<Card> cards)
         {
             CardRenderer renderer = new();
@@ -202,9 +225,16 @@ namespace Kunskapskontroll3
             return player;
         }
 
+        // Console.Clear() lämnar ibland kvar rester av korten i VS Code-terminalen på Windows.
+        // Terminalkoderna tömmer skärmen (2J), historiken ovanför (3J) och flyttar markören högst upp (H).
+        private static void ClearScreen()
+        {
+            Console.Write("\x1b[2J\x1b[3J\x1b[H");
+        }
+
         public void DisplayRules()
         {
-            Console.Clear();
+            ClearScreen();
             Console.WriteLine("--- REGLER ---");
             Console.WriteLine("Kom så nära 21 som möjligt utan att överstiga 21.");
             Console.WriteLine("\nTryck på valfri tangent för att gå tillbaka.");
