@@ -31,6 +31,7 @@ namespace Kunskapskontroll3
             string[] lines = File.ReadAllLines("players.txt");
             foreach (string line in lines)
             {
+                if(line.Trim() == "") continue;
                 string[] parts = line.Split(';');
 
                 if (parts.Length != 5)
