@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Kunskapskontroll3;
 
 public static class Config
 {
@@ -18,6 +19,10 @@ public static class Config
     // Körs automatiskt första gången Config används
     static Config()
     {
+        Console.Clear();
+        Console.WriteLine("Filen \"Config.json\" hittades inte.\nSkapat en ny med standardvärden");
+        Console.WriteLine("Tryck på valfri tangent för att gå vidare...");
+        Console.ReadKey();
         LoadConfig();
     }
 
