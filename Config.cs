@@ -3,7 +3,12 @@ using Kunskapskontroll3;
 
 public static class Config
 {
-    private const string FilePath = "config.json";
+    private const string FilePath = "config.txt";
+
+    private const int MinDeckCount = 1;
+
+    private const int MinCardCount = 10;
+
     // Om Dealern ska köpa på en mjuk 17
     public static bool ShouldHitOnSoft = false;
 
@@ -19,10 +24,6 @@ public static class Config
     // Körs automatiskt första gången Config används
     static Config()
     {
-        Console.Clear();
-        Console.WriteLine("Filen \"Config.json\" hittades inte.\nSkapat en ny med standardvärden");
-        Console.WriteLine("Tryck på valfri tangent för att gå vidare...");
-        Console.ReadKey();
         LoadConfig();
     }
 
@@ -63,6 +64,10 @@ public static class Config
         if (!File.Exists(FilePath))
         {
             SaveConfig();
+            Console.Clear();
+            Console.WriteLine("Filen \"Config.txt\" hittades inte.\nSkapat en ny med standardvärden");
+            Console.WriteLine("Tryck på valfri tangent för att gå vidare...");
+            Console.ReadKey();
             return;
         }
 
@@ -77,14 +82,26 @@ public static class Config
             }
 
             ShouldHitOnSoft = data.ShouldHitOnSoft;
-            DeckCount = data.DeckCount;
-            MinDeckCardAmount = data.MinDeckCardAmount;
+            DeckCount = Math.Max(data.DeckCount, MinDeckCount);
+            MinDeckCardAmount = Math.Max(data.MinDeckCardAmount, MinCardCount);
             NaturalBlackjackWin = data.NaturalBlackjackWin;
+
+            if(data.DeckCount < MinDeckCount || data.MinDeckCardAmount < MinCardCount)
+            {
+                Console.Clear();
+            Console.WriteLine("Ett värde i filen \"Config.txt\" var utanför den tillåtna intervallet.\nÄndrar värdern(a) till dess minsta tillåtna värde");
+            Console.WriteLine("Tryck på valfri tangent för att gå vidare...");
+            Console.ReadKey();
+            }
+
+
+
         }
         catch (JsonException)
         {
-            Console.WriteLine("\"Config.cs\" filen kunde inte ladda in. \nAnvänder standard inställningar");
+            Console.WriteLine("\"Config.txt\" filen kunde inte ladda in. \nAnvänder standard inställningar");
             // Filen är trasig, så behåll standardvärdena
         }
     }
+    
 }
