@@ -227,7 +227,7 @@ namespace Kunskapskontroll3
                 {
                     player.RecordOutcome(Outcome.Lose);
                 }
-                else if (result.Contains("Lika") || result.Contains("Push"))
+                else if (result.Contains("Lika") || result.Contains("Push") || result.Contains("Oavgjort"))
                 {
                     player.RecordOutcome(Outcome.Push);
                 }
