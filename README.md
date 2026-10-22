@@ -54,3 +54,24 @@ Efter varje runda anropas `_gameStorage.SavePlayers(_savedPlayers)` i `StartNewG
 - Bygga och prova lagring, spelarstatistik och spelrundans gränsfall.
 
 Projektet integrerar gemensamt arbete via feature-brancher och pull requests till `dev`.
+
+## Tillval / Individuell del: Marker- och insatssystem (Uppgift 4)
+**Ansvarig:** Lisette
+
+### Vad som har implementerats:
+* **Ekonomi och saldon:** 
+  - Lagt till stöd för markersaldo (`Chips`) och aktuella insatser (`CurrentBet`) för varje spelare.
+  - Implementerat en validerad insatsfas (`PlaceBet()`) i början av varje runda där marker dras från spelarens saldo. Både mänskliga spelare och datorspelare (bots) kan placera giltiga insatser baserade på sina tillgängliga tillgångar.
+* **Utbetalningslogik:**
+  - Standardvinst betalar **1:1** (`WinBet()` – ger tillbaka insatsen plus lika mycket i vinst).
+  - Blackjack betalar **3:2** (`BlackjackPayout()` – ger tillbaka insatsen plus 1.5x insatsen i vinst).
+  - Oavgjort / Push (`PushBet()` – återlämnar insatsen oavkortat till saldot).
+  - Förlust (`LoseBet()` – nollställer aktuell insats då markerna drogs vid rundans start).
+* **Integrering & Saldostyrning:**
+  - Kopplat samman resultatberäkningen i `Round` och `ConsoleUi` med spelarnas `RecordOutcome()` så att utbetalningar och statistik registreras konsekvent.
+  - Automatisk hantering för att ta bort spelare som får 0 marker ("panka") inför nästa runda.
+  - Förberett och anpassat datakonstruktorer för persistering av markersaldon via `GameStorage`.
+
+  Markdown
+## Klassdiagram
+![Klassdiagram over 21](//www.plantuml.com/plantuml/png/hLPRLnit47xVNw53psbC2WwqwQLxKax0170BX6BIF8lTmLRHIZwwOEZblsT6Omkn-F0K7hIZcT4ttrmayzu7wKBiTELlbPbB9plHQEdzVWXENSS0uyQQYVe7n4xXqbbZcvcp7OWRgJtqJuj_Au5_1xAvdJeRJJkosZhnUQO2iCMw5Xnh3pIw9Us-StPHAl-lgbVYWucThm1NCOag9EmJGDeUXKCbaKnBuaZ7Q_fEvh85ZsVvpAKqj-dCrSAAtyJt9CqS0Ce_e7naeqFnBOdgZhG_4eQwH-adak0E3Ce_e_n1JMS1vLzGFbU6d7ybkEImkuFYxyYQv5sK_up01WhvXp9JaYdaVWCaliqKp-mTS5egKCWWJPkD7sDeRCVspyhWUcezuESY-babk59_vsgDJG1t8nkiW5g9OdoXvGEuIN0omFGXONqdHZEBI1HyCCE8jJZ1TKkq83NsHZhKqBfP9u8CFx8En1jnQ3kf3EfRqBxYdfCl8wS-rMcbRMf1dLRQ9iU1povRmcNxPd8uXl2Nr14665ePnhYoo1wBI3gV92J4aOatHzuM3MBxMfmg7zvHd3sEoDhn9SZsez4FFNCAzXXglsqJnQOimPrLBMDfa6vGQiR-8Ff0gcjhzLALsvBrI5TU8tNP1C6yBwGBgb5pQSAoSEUoWvmVAKvoOt3xJNbYO0fVhjibD80p_0BvSrWGLgQVIyW3mYnep7mk1usRXs9FSrVkSwQ5RZHJyt8RdGCJ3Y0ywbR3MFUdCrbPrSznlM6Blkknyfa6CFX0TZOQvf2xnVcYjUXfaTI5VB2nj741-lvq9_iwR8TrxVB-3Yn_Qx5Kb9uJ29CWWnyiLfNV4fhBpfivXioRwxBWf6XojP_rzH2apdtbpM2JOyvirEs9oeDR7cfkNxnFv91XuisDXY9nZaFEfAGlLyt1N3euikuSxiEbZUl6SAAwkOQlz5env87qglbgxz-nx02RFLMD-5OSQRjOHadvB76FbtTmtxIZ6LOglGxpnvjRbzSOkrT6oZD9ZBbVLz6P0PEg1QkG9EBY3jUdXG_WEcK09zfWf-SfxJg1yQaIvVbBokbnv_diglUCi9SiFbWdfr0dxmblKdZQhyOYI5VS1fwtnHcO-Bpf1Smozet28P1XLZw5fTkWxy11JwricQYdA2LnfY3lO6LVcrv1xPNuD1PlQ6ezc223icRrEsUDjne-gMMxpwGofzRESsBbauFZpjYzNZpfcl9aP0FDu0k-5vXjw3_m9UjBq8cin_ayX3cO5aoZm5VbZysx_xQtb-3FzJmSLTLxIj4u7Awze6izrzsxgkAzsDZT4AynrCRES8XYxtn9ARlYbty6QNa2y7g37nbQIdV-_wElvNz3AhevQr5eole6fjSpuRUS_ufVWE5mJvJqQq5FYmPVs2as6g97RHuciYH0jBGy47qh8zG2xg690G-_n-x6Jdy1)
