@@ -57,6 +57,28 @@ Efter varje runda anropas `_gameStorage.SavePlayers(_savedPlayers)` i `StartNewG
 
 Projektet integrerar gemensamt arbete via feature-brancher och pull requests till `dev`.
 
+### Tillval / Individuell del: Husregler från konfigurationsfil (Isac)
+
+## Vad som har implementerats:
+* **Inställningar i `Config`:**
+  - `ShouldHitOnSoft` – om givaren köper på mjuk 17 eller stannar.
+  - `DeckCount` – hur många kortlekar som spelas med.
+  - `MinDeckCardAmount` – vid hur många kvarvarande kort leken blandas om.
+  - `NaturalBlackjackWin` – om naturlig tjugoett vinner över en 21 byggd av tre eller fler kort.
+* **Fillagring:**
+  - Inställningarna sparas i textfilen `config.txt` med `SaveConfig()` och läses in med `LoadConfig()`. Filen läses in automatiskt av en statisk konstruktor första gången `Config` används.
+  - Saknas filen skapas en ny med standardvärden och användaren får ett meddelande – programmet kraschar inte.
+  - Är filen trasig behålls standardvärdena och användaren får ett meddelande.
+  - För låga värden höjs till minsta tillåtna värde (`MinDeckCount` och `MinCardCount`) med `Math.Max`, och användaren får ett meddelande.
+  - Den privata klassen `ConfigData` används för att flytta värdena till och från filen, eftersom `JsonSerializer` inte kan spara statiska fält.
+* **Användning i spelet:**
+  - `Round.PlayDealerTurn()` låter givaren köpa på mjuk 17 när `ShouldHitOnSoft` är på.
+  - `Deck` bygger leken med `DeckCount` lekar, och `PrepareForNextRound()` blandar om när färre än `MinDeckCardAmount` kort återstår.
+  - `Round.DetermineWinner()` använder `NaturalBlackjackWin` när en naturlig tjugoett möter en 21 byggd av tre eller fler kort.
+* **Inställningsmeny:**
+  - `ConsoleUi.Settings()` visar de aktuella inställningarna med `Config.PrintConfig()` och låter användaren ändra dem, spara till fil eller ladda från fil.
+  - Hjälpmetoderna `ReadYesNo()` och `ReadNumber()` frågar tills användaren anger ett giltigt svar.
+
 ## Tillval / Individuell del: Marker- och insatssystem (Uppgift 4)
 **Ansvarig:** Lisette
 
